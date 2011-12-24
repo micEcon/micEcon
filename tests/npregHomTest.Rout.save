@@ -1,1761 +1,0 @@
-
-R version 2.14.1 (2011-12-22)
-Copyright (C) 2011 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
-Platform: i686-pc-linux-gnu (32-bit)
-
-R is free software and comes with ABSOLUTELY NO WARRANTY.
-You are welcome to redistribute it under certain conditions.
-Type 'license()' or 'licence()' for distribution details.
-
-R is a collaborative project with many contributors.
-Type 'contributors()' for more information and
-'citation()' on how to cite R or R packages in publications.
-
-Type 'demo()' for some demos, 'help()' for on-line help, or
-'help.start()' for an HTML browser interface to help.
-Type 'q()' to quit R.
-
-> # load micEcon package
-> library( micEcon )
-Loading required package: np
-Loading required package: boot
-Loading required package: cubature
-Nonparametric Kernel Methods for Mixed Datatypes (version 0.40-12)
-Loading required package: miscTools
-> 
-> # load data
-> data( germanFarms )
-> # output quantity
-> germanFarms$qOutput <- germanFarms$vOutput / germanFarms$pOutput
-> # quantity of variable inputs
-> germanFarms$qVarInput <- germanFarms$vVarInput / germanFarms$pVarInput
-> # a time trend to account for technical progress:
-> germanFarms$time <- c(1:20)
-> 
-> # weights to impose normalize prices
-> weights <- c(
-+    pOutput = mean( germanFarms$qOutput ),
-+    pVarInput = mean( germanFarms$qVarInput ),
-+    pLabor = mean( germanFarms$qLabor ) )
-> weights <- weights / sum( weights )
-> 
-> # estimation (restricted gradients)
-> npseed( 123 )
-> estResult <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights )
-Multistart 1 of 3 |Multistart 1 of 3 |Multistart 1 of 3 |Multistart 1 of 3 /Multistart 1 of 3 -Multistart 1 of 3 \Multistart 1 of 3 |Multistart 1 of 3 /Multistart 1 of 3 |Multistart 1 of 3 |Multistart 1 of 3 /Multistart 1 of 3 -Multistart 1 of 3 \Multistart 2 of 3 |Multistart 2 of 3 |Multistart 2 of 3 /Multistart 2 of 3 -Multistart 2 of 3 |Multistart 2 of 3 |Multistart 2 of 3 /Multistart 2 of 3 -Multistart 3 of 3 |Multistart 3 of 3 |Multistart 3 of 3 /Multistart 3 of 3 -Multistart 3 of 3 \Multistart 3 of 3 |Multistart 3 of 3 |Multistart 3 of 3 /Multistart 3 of 3 -                   > print( estResult )
-$call
-npregHom(yName = "qVarInput", xNames = c("pOutput", "pVarInput", 
-    "pLabor", "land"), homWeights = weights, data = germanFarms)
-
-$yName
-[1] "qVarInput"
-
-$xNames
-[1] "pOutput"   "pVarInput" "pLabor"    "land"     
-
-$homWeights
-     pOutput    pVarInput       pLabor 
-0.6723446781 0.3269168696 0.0007384522 
-
-$restrictGrad
-[1] TRUE
-
-$est
-
-Regression Data: 20 training points, in 3 variable(s)
-                     r_2      r_3      r_4
-Bandwidth(s): 0.01664024 26.66757 1.589505
-
-Kernel Regression Estimator: Local-Constant
-Bandwidth Type: Fixed
-
-Continuous Kernel Type: Second-Order Gaussian
-No. Continuous Explanatory Vars.: 3
-
-
-$grad
-         pOutput pVarInput        pLabor       land
- [1,] -2.3490393  2.545766  1.944730e-03  0.8427034
- [2,] -2.4945196  2.563155  1.757982e-03  0.8750529
- [3,] -2.2761224  2.551964  1.014854e-04  0.2673162
- [4,] -1.7078679  1.867146 -1.423325e-04  0.1994970
- [5,] -0.4717484  0.481973  7.956272e-05  0.3086799
- [6,]  2.9975397 -2.994539 -1.775170e-05  0.6788984
- [7,]  2.1748425 -2.182408 -1.510609e-05  0.7419406
- [8,]  3.9802649 -3.905879  5.643104e-05  0.5801248
- [9,]  1.7326371 -1.703549  1.959667e-04  0.7900884
-[10,] -6.1168493  5.569793  8.101432e-04  6.1365157
-[11,] -3.5216759  2.983901  1.348740e-03  9.0304934
-[12,] -2.7541360  2.174676  1.831971e-03  9.6005935
-[13,] -3.2856126  2.908799  5.800798e-04  3.0583681
-[14,] -3.8457660  3.498121  2.865944e-04  2.2558040
-[15,] -5.8787909  5.407311  5.923244e-04  1.8341178
-[16,]  6.8291619 -5.861923 -6.684419e-04 -3.9806272
-[17,]  1.7756946 -1.485200 -2.666554e-04 -2.8689169
-[18,] -2.0945439  1.612853  2.564679e-04  2.7735968
-[19,]  1.4899093 -1.474482  1.264643e-03  6.3116329
-[20,]  3.0108685 -2.701733  1.215329e-03  5.4040093
-
-attr(,"class")
-[1] "npregHom"
-> all.equal( estResult$grad[ , "pOutput" ] * germanFarms$pOutput +
-+    estResult$grad[ , "pVarInput" ] * germanFarms$pVarInput,
-+    - estResult$grad[ , "pLabor" ] * germanFarms$pLabor )
-[1] TRUE
-> estEla <- elas( estResult )
-> print( estEla )
-       pOutput   pVarInput        pLabor         land
-1  -0.40444822  0.37563474  0.0288134843  0.035253614
-2  -0.41396462  0.37317821  0.0407864040  0.035003161
-3  -0.36754682  0.36447517  0.0030716577  0.010830283
-4  -0.24913705  0.25260878 -0.0034717268  0.007640925
-5  -0.07177836  0.06978059  0.0019977654  0.011823164
-6   0.45418369 -0.45372902 -0.0004546725  0.025953062
-7   0.35482835 -0.35440247 -0.0004258785  0.029051613
-8   0.65629030 -0.65796616  0.0016758538  0.023125078
-9   0.28816855 -0.29374483  0.0055762890  0.030797534
-10 -0.96934989  0.94502506  0.0243248233  0.242435460
-11 -0.51944865  0.48078322  0.0386654354  0.357669490
-12 -0.33832991  0.28779032  0.0505395902  0.373288139
-13 -0.39180549  0.37534696  0.0164585288  0.122374540
-14 -0.47885811  0.47084142  0.0080166872  0.093167604
-15 -0.77439475  0.75705748  0.0173372682  0.075158176
-16  0.90026188 -0.87697595 -0.0232859300 -0.177025072
-17  0.24571798 -0.23553052 -0.0101874529 -0.136062288
-18 -0.26552405  0.25573867  0.0097853819  0.138032552
-19  0.17421991 -0.22337771  0.0491577906  0.320007175
-20  0.35205392 -0.40190427  0.0498503517  0.279014555
-> all.equal( estEla[[ "pOutput" ]] + estEla[[ "pVarInput" ]],
-+    - estEla[[ "pLabor" ]] )
-[1] TRUE
-> estElaObs <- elas( estResult, yObs = TRUE )
-> print( estElaObs )
-       pOutput   pVarInput        pLabor         land
-1  -0.40648821  0.37752939  0.0289588158  0.035431429
-2  -0.41283357  0.37215861  0.0406749662  0.034907524
-3  -0.36844782  0.36536863  0.0030791875  0.010856832
-4  -0.24777143  0.25122413 -0.0034526969  0.007599042
-5  -0.07208039  0.07007422  0.0020061717  0.011872914
-6   0.45625402 -0.45579728 -0.0004567451  0.026071366
-7   0.34863692 -0.34821847 -0.0004184473  0.028544689
-8   0.65992669 -0.66161183  0.0016851394  0.023253210
-9   0.29086902 -0.29649756  0.0056285452  0.031086143
-10 -0.98639783  0.96164521  0.0247526237  0.246699169
-11 -0.51451209  0.47621411  0.0382979797  0.354270389
-12 -0.34155856  0.29053668  0.0510218846  0.376850392
-13 -0.38018467  0.36421430  0.0159703746  0.118744954
-14 -0.46780742  0.45997574  0.0078316847  0.091017560
-15 -0.80824378  0.79014869  0.0180950854  0.078443362
-16  0.89786685 -0.87464287 -0.0232239808 -0.176554120
-17  0.24799927 -0.23771723 -0.0102820350 -0.137325515
-18 -0.26654417  0.25672119  0.0098229763  0.138562857
-19  0.17532180 -0.22479050  0.0494686986  0.322031123
-20  0.34873573 -0.39811623  0.0493805008  0.276384779
-> all.equal( estElaObs[[ "pOutput" ]] + estElaObs[[ "pVarInput" ]],
-+    - estElaObs[[ "pLabor" ]] )
-[1] TRUE
-> # different normalized variable omitted
-> npseed( 123 )
-> estResult2 <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights[ c( 3, 2, 1 ) ] )
-Multistart 1 of 3 |Multistart 1 of 3 |Multistart 1 of 3 |Multistart 1 of 3 /Multistart 1 of 3 -Multistart 1 of 3 \Multistart 1 of 3 |Multistart 1 of 3 |Multistart 1 of 3 |Multistart 1 of 3 /Multistart 1 of 3 -Multistart 1 of 3 \Multistart 2 of 3 |Multistart 2 of 3 |Multistart 2 of 3 /Multistart 2 of 3 -Multistart 2 of 3 |Multistart 2 of 3 |Multistart 2 of 3 /Multistart 2 of 3 -Multistart 2 of 3 \Multistart 3 of 3 |Multistart 3 of 3 |Multistart 3 of 3 /Multistart 3 of 3 |Multistart 3 of 3 |Multistart 3 of 3 /Multistart 3 of 3 -                   > print( estResult2 )
-$call
-npregHom(yName = "qVarInput", xNames = c("pOutput", "pVarInput", 
-    "pLabor", "land"), homWeights = weights[c(3, 2, 1)], data = germanFarms)
-
-$yName
-[1] "qVarInput"
-
-$xNames
-[1] "pOutput"   "pVarInput" "pLabor"    "land"     
-
-$homWeights
-      pLabor    pVarInput      pOutput 
-0.0007384522 0.3269168696 0.6723446781 
-
-$restrictGrad
-[1] TRUE
-
-$est
-
-Regression Data: 20 training points, in 3 variable(s)
-                   r_1      r_2      r_4
-Bandwidth(s): 10.00021 49.45095 2.664302
-
-Kernel Regression Estimator: Local-Constant
-Bandwidth Type: Fixed
-
-Continuous Kernel Type: Second-Order Gaussian
-No. Continuous Explanatory Vars.: 3
-
-
-$grad
-            pOutput     pVarInput        pLabor          land
- [1,] -0.0001431205 -6.852034e-05  2.345561e-06  0.0000564328
- [2,] -1.8535103225 -8.923045e-01  1.885732e-02  1.5913975913
- [3,]  0.5814548372  2.805680e-01 -4.426079e-03  3.4615693963
- [4,] -0.1435944414 -6.922069e-02  1.242718e-03  0.7145123670
- [5,] -0.3062708159 -1.476174e-01  2.707064e-03  0.7077152335
- [6,] -0.2302590154 -1.109878e-01  2.018722e-03  0.7054673788
- [7,] -0.0850802349 -4.101632e-02  7.286198e-04  0.7820439955
- [8,]  0.0716722695  3.456416e-02 -5.940013e-04  1.0722636508
- [9,] -0.2106180270 -1.015207e-01  1.846225e-03  0.7046111705
-[10,]  0.2033752929  9.810092e-02 -1.627761e-03  1.7770648645
-[11,] -0.0105201977 -5.069448e-03  8.262058e-05  2.7573460550
-[12,] -1.3036414055 -6.294896e-01  8.824622e-03  2.9512837276
-[13,]  0.7071364569  3.415670e-01 -4.525467e-03 -0.0866876034
-[14,] -0.5843242195 -2.821513e-01  3.958733e-03  1.2997663735
-[15,] -0.7336881890 -3.542634e-01  4.996451e-03  1.7145568158
-[16,]  3.5758344099  1.728056e+00 -2.095281e-02 -3.4325883463
-[17,]  1.0842221489  5.240675e-01 -6.102473e-03 -1.6780182234
-[18,] -0.5588912194 -2.702155e-01  2.979904e-03  0.7012353520
-[19,] -2.4018379919 -1.161705e+00  1.175296e-02  3.4143042503
-[20,] -1.4227925675 -6.883426e-01  6.552254e-03  2.1748769525
-
-attr(,"class")
-[1] "npregHom"
-> all.equal( estResult2$grad[ , "pOutput" ] * germanFarms$pOutput +
-+    estResult2$grad[ , "pVarInput" ] * germanFarms$pVarInput,
-+    - estResult2$grad[ , "pLabor" ] * germanFarms$pLabor )
-[1] TRUE
-> estEla2 <- elas( estResult2 )
-> print( estEla2 )
-         pOutput     pVarInput        pLabor          land
-1  -2.476619e-05 -1.016135e-05  3.492754e-05  2.372713e-06
-2  -2.978302e-01 -1.257917e-01  4.236219e-01  6.163808e-02
-3   8.855516e-02  3.779309e-02 -1.263482e-01  1.322721e-01
-4  -2.088360e-02 -9.336622e-03  3.022022e-02  2.728368e-02
-5  -4.650510e-02 -2.132855e-02  6.783366e-02  2.705178e-02
-6  -3.530352e-02 -1.701675e-02  5.232027e-02  2.728950e-02
-7  -1.406033e-02 -6.746741e-03  2.080708e-02  3.101764e-02
-8   1.178418e-02  5.805973e-03 -1.759015e-02  4.262139e-02
-9  -3.469534e-02 -1.733831e-02  5.203364e-02  2.720360e-02
-10  3.258480e-02  1.682835e-02 -4.941314e-02  7.098092e-02
-11 -1.604016e-03 -8.443393e-04  2.448355e-03  1.128894e-01
-12 -1.604294e-01 -8.345277e-02  2.438821e-01  1.149550e-01
-13  8.494086e-02  4.439708e-02 -1.293379e-01 -3.493957e-03
-14 -7.353326e-02 -3.838202e-02  1.119153e-01  5.425438e-02
-15 -9.658758e-02 -4.956888e-02  1.461565e-01  7.021603e-02
-16  4.654849e-01  2.552890e-01 -7.207739e-01 -1.507411e-01
-17  1.497491e-01  8.295199e-02 -2.327011e-01 -7.943168e-02
-18 -7.077297e-02 -4.279940e-02  1.135724e-01  3.486003e-02
-19 -2.806311e-01 -1.758532e-01  4.564843e-01  1.729714e-01
-20 -1.668909e-01 -1.027208e-01  2.696117e-01  1.126469e-01
-> all.equal( estEla2[[ "pOutput" ]] + estEla2[[ "pVarInput" ]],
-+    - estEla2[[ "pLabor" ]] )
-[1] TRUE
-> estEla2Obs <- elas( estResult2, yObs = TRUE )
-> print( estEla2Obs )
-         pOutput     pVarInput        pLabor          land
-1  -2.476621e-05 -1.016136e-05  3.492757e-05  2.372715e-06
-2  -3.067490e-01 -1.295586e-01  4.363076e-01  6.348388e-02
-3   9.412313e-02  4.016936e-02 -1.342925e-01  1.405889e-01
-4  -2.083217e-02 -9.313629e-03  3.014580e-02  2.721649e-02
-5  -4.679639e-02 -2.146214e-02  6.825853e-02  2.722121e-02
-6  -3.504761e-02 -1.689340e-02  5.194101e-02  2.709168e-02
-7  -1.363874e-02 -6.544442e-03  2.018318e-02  3.008759e-02
-8   1.188324e-02  5.854779e-03 -1.773802e-02  4.297967e-02
-9  -3.535781e-02 -1.766937e-02  5.302718e-02  2.772303e-02
-10  3.279612e-02  1.693748e-02 -4.973361e-02  7.144126e-02
-11 -1.536987e-03 -8.090559e-04  2.346043e-03  1.081719e-01
-12 -1.616732e-01 -8.409978e-02  2.457729e-01  1.158462e-01
-13  8.182415e-02  4.276803e-02 -1.245922e-01 -3.365754e-03
-14 -7.107848e-02 -3.710070e-02  1.081792e-01  5.244319e-02
-15 -1.008709e-01 -5.176709e-02  1.526380e-01  7.332986e-02
-16  4.701343e-01  2.578389e-01 -7.279732e-01 -1.522468e-01
-17  1.514260e-01  8.388088e-02 -2.353069e-01 -8.032115e-02
-18 -7.112250e-02 -4.301077e-02  1.141333e-01  3.503219e-02
-19 -2.826310e-01 -1.771064e-01  4.597374e-01  1.742041e-01
-20 -1.647958e-01 -1.014313e-01  2.662271e-01  1.112328e-01
-> all.equal( estEla2Obs[[ "pOutput" ]] + estEla2Obs[[ "pVarInput" ]],
-+    - estEla2Obs[[ "pLabor" ]] )
-[1] TRUE
-> 
-> # estimation (gradients not restricted)
-> npseed( 123 )
-> estResultAll <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights, restrictGrad = FALSE )
-Multistart 1 of 4 |Multistart 1 of 4 |Multistart 1 of 4 |Multistart 1 of 4 /Multistart 1 of 4 -Multistart 1 of 4 \Multistart 1 of 4 |Multistart 1 of 4 |Multistart 1 of 4 /Multistart 1 of 4 -Multistart 1 of 4 \Multistart 2 of 4 |Multistart 2 of 4 |Multistart 2 of 4 /Multistart 2 of 4 -Multistart 2 of 4 \Multistart 2 of 4 |Multistart 2 of 4 |Multistart 2 of 4 /Multistart 3 of 4 |Multistart 3 of 4 |Multistart 3 of 4 /Multistart 3 of 4 -Multistart 3 of 4 \Multistart 3 of 4 |Multistart 3 of 4 |Multistart 3 of 4 |Multistart 4 of 4 |Multistart 4 of 4 |Multistart 4 of 4 /Multistart 4 of 4 -Multistart 4 of 4 \Multistart 4 of 4 |Multistart 4 of 4 |Multistart 4 of 4 |Multistart 4 of 4 /Multistart 4 of 4 -Multistart 4 of 4 \                   > print( estResultAll )
-$call
-npregHom(yName = "qVarInput", xNames = c("pOutput", "pVarInput", 
-    "pLabor", "land"), homWeights = weights, data = germanFarms, 
-    restrictGrad = FALSE)
-
-$yName
-[1] "qVarInput"
-
-$xNames
-[1] "pOutput"   "pVarInput" "pLabor"    "land"     
-
-$homWeights
-     pOutput    pVarInput       pLabor 
-0.6723446781 0.3269168696 0.0007384522 
-
-$restrictGrad
-[1] FALSE
-
-$est
-
-Regression Data: 20 training points, in 4 variable(s)
-                     r_1        r_2      r_3      r_4
-Bandwidth(s): 0.01327776 0.01144763 72771455 2.005919
-
-Kernel Regression Estimator: Local-Constant
-Bandwidth Type: Fixed
-
-Continuous Kernel Type: Second-Order Gaussian
-No. Continuous Explanatory Vars.: 4
-
-
-$grad
-          pOutput  pVarInput        pLabor         land
- [1,]  0.09398839 -0.1085895 -1.079019e-05  0.015006913
- [2,] -0.82214876  0.9249881  7.599807e-05  0.149669680
- [3,] -0.26609948  0.2961552  2.221110e-05  0.007373734
- [4,]  0.20061418 -0.2144642 -1.023514e-05  0.105926838
- [5,] -0.61194095  0.6395630  2.041266e-05  0.222443311
- [6,]  3.99299582 -3.9929958 -6.179649e-18  0.353667270
- [7,]  2.67466570 -2.6857704 -8.206341e-06  0.422677197
- [8,]  5.15148424 -5.0549156  7.136403e-05  0.387649986
- [9,]  2.01177417 -1.9482035  4.697856e-05  0.582563056
-[10,] -5.08800713  4.7910509 -2.194500e-04  3.049208457
-[11,] -4.12028179  3.8123462 -2.275638e-04  2.419317097
-[12,]  0.16229075 -0.1522034  7.454566e-06  3.376529512
-[13,] -0.87373821  0.8167166 -4.213883e-05  1.127916121
-[14,] -2.81884378  2.6357976 -1.352708e-04  1.843848287
-[15,] -4.11270362  3.9020417 -1.556788e-04  1.181031754
-[16,]  4.99156828 -4.4854524  3.740186e-04 -3.116586313
-[17,]  0.77457729 -0.6907977  6.191291e-05 -2.055141203
-[18,] -0.85276363  0.7075907 -1.072825e-04  1.977950712
-[19,]  3.58982883 -2.9013786  5.087633e-04  3.225206438
-[20,]  5.18691715 -4.2649277  6.813483e-04  2.006474560
-
-attr(,"class")
-[1] "npregHom"
-> all.equal( estResultAll$grad[ , "pOutput" ] * germanFarms$pOutput +
-+    estResultAll$grad[ , "pVarInput" ] * germanFarms$pVarInput,
-+    - estResultAll$grad[ , "pLabor" ] * germanFarms$pLabor )
-[1] TRUE
-> estElaAll <- elas( estResultAll )
-> print( estElaAll )
-       pOutput   pVarInput        pLabor          land
-1   0.01626196 -0.01610131 -1.606541e-04  0.0006308793
-2  -0.13590359  0.13414725  1.756337e-03  0.0059636345
-3  -0.04306798  0.04239418  6.738027e-04  0.0002994301
-4   0.02919965 -0.02895056 -2.490962e-04  0.0040480653
-5  -0.09314124  0.09262851  5.127243e-04  0.0085230308
-6   0.60517688 -0.60517688 -1.583213e-16  0.0135237020
-7   0.43624830 -0.43601701 -2.312900e-04  0.0165456437
-8   0.84739715 -0.84951145  2.114307e-03  0.0154160155
-9   0.33491803 -0.33625611  1.338083e-03  0.0227302142
-10 -0.80777315  0.81437419 -6.601041e-03  0.1206841738
-11 -0.61203881  0.61860868 -6.569868e-03  0.0964988217
-12  0.01987417 -0.02007918  2.050104e-04  0.1308750714
-13 -0.10433741  0.10553468 -1.197265e-03  0.0451941979
-14 -0.35207615  0.35587169 -3.795533e-03  0.0763889189
-15 -0.54179073  0.54634774 -4.557012e-03  0.0483994406
-16  0.65702715 -0.67003687  1.300972e-02 -0.1383908177
-17  0.10700903 -0.10937050  2.361476e-03 -0.0973079822
-18 -0.10796878  0.11205694 -4.088168e-03  0.0983125045
-19  0.42235287 -0.44225062  1.989775e-02  0.1645277858
-20  0.60375835 -0.63157982  2.782147e-02  0.1031290160
-> all.equal( estElaAll[[ "pOutput" ]] + estElaAll[[ "pVarInput" ]],
-+    - estElaAll[[ "pLabor" ]] )
-[1] TRUE
-> estElaAllObs <- elas( estResultAll, yObs = TRUE )
-> print( estElaAllObs )
-       pOutput   pVarInput        pLabor          land
-1   0.01626417 -0.01610349 -1.606759e-04  0.0006309650
-2  -0.13606251  0.13430412  1.758390e-03  0.0059706082
-3  -0.04307491  0.04240100  6.739111e-04  0.0002994783
-4   0.02910440 -0.02885611 -2.482836e-04  0.0040348592
-5  -0.09350100  0.09298629  5.147048e-04  0.0085559512
-6   0.60777191 -0.60777191 -1.590002e-16  0.0135816924
-7   0.42876080 -0.42853348 -2.273203e-04  0.0162616645
-8   0.85411451 -0.85624558  2.131067e-03  0.0155382191
-9   0.33772956 -0.33907887  1.349316e-03  0.0229210268
-10 -0.82048764  0.82719258 -6.704942e-03  0.1225837638
-11 -0.60196760  0.60842936 -6.461760e-03  0.0949109165
-12  0.02012675 -0.02033436  2.076158e-04  0.1325383133
-13 -0.10110196  0.10226210 -1.160138e-03  0.0437927489
-14 -0.34289035  0.34658686 -3.696506e-03  0.0743959027
-15 -0.56543380  0.57018968 -4.755875e-03  0.0505115321
-16  0.65626848 -0.66926318  1.299470e-02 -0.1382310174
-17  0.10817997 -0.11056729  2.387316e-03 -0.0983727764
-18 -0.10851965  0.11262868 -4.109027e-03  0.0988141096
-19  0.42242521 -0.44232637  1.990116e-02  0.1645559663
-20  0.60077793 -0.62846206  2.768413e-02  0.1026199252
-> all.equal( estElaAllObs[[ "pOutput" ]] + estElaAllObs[[ "pVarInput" ]],
-+    - estElaAllObs[[ "pLabor" ]] )
-[1] TRUE
-> # different order of weights
-> npseed( 123 )
-> estResultAll2 <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights[ c( 3, 2, 1 ) ],
-+    restrictGrad = FALSE )
-Multistart 1 of 4 |Multistart 1 of 4 |Multistart 1 of 4 |Multistart 1 of 4 /Multistart 1 of 4 -Multistart 1 of 4 \Multistart 1 of 4 |Multistart 1 of 4 |Multistart 1 of 4 /Multistart 1 of 4 -Multistart 1 of 4 \Multistart 2 of 4 |Multistart 2 of 4 |Multistart 2 of 4 /Multistart 2 of 4 -Multistart 2 of 4 \Multistart 2 of 4 |Multistart 2 of 4 |Multistart 2 of 4 /Multistart 3 of 4 |Multistart 3 of 4 |Multistart 3 of 4 /Multistart 3 of 4 -Multistart 3 of 4 \Multistart 3 of 4 |Multistart 3 of 4 |Multistart 3 of 4 |Multistart 4 of 4 |Multistart 4 of 4 |Multistart 4 of 4 /Multistart 4 of 4 -Multistart 4 of 4 \Multistart 4 of 4 |Multistart 4 of 4 |Multistart 4 of 4 |Multistart 4 of 4 /Multistart 4 of 4 -Multistart 4 of 4 \                   > all.equal( estResultAll$grad, estResultAll2$grad, tolerance = 1e-6 )
-[1] TRUE
-> all.equal( elas( estResultAll ), elas( estResultAll2 ), tolerance = 1e-6 )
-[1] TRUE
-> all.equal( elas( estResultAll, yObs = TRUE ),
-+    elas( estResultAll2, yObs = TRUE ), tolerance = 1e-6 )
-[1] TRUE
-> 
-> 
-> # estimation with Epanechnikov kernel (restricted gradients)
-> npseed( 123 )
-> estResultEpa <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights, ckertype="epanechnikov" )
-Multistart 1 of 3 |Multistart 1 of 3 |Multistart 1 of 3 |Multistart 1 of 3 /Multistart 1 of 3 -Multistart 1 of 3 \Multistart 1 of 3 |Multistart 1 of 3 |Multistart 2 of 3 |Multistart 2 of 3 |Multistart 2 of 3 /Multistart 2 of 3 |Multistart 2 of 3 |Multistart 3 of 3 |Multistart 3 of 3 |Multistart 3 of 3 /Multistart 3 of 3 |Multistart 3 of 3 |Multistart 3 of 3 /                   > print( estResultEpa )
-$call
-npregHom(yName = "qVarInput", xNames = c("pOutput", "pVarInput", 
-    "pLabor", "land"), homWeights = weights, data = germanFarms, 
-    ckertype = "epanechnikov")
-
-$yName
-[1] "qVarInput"
-
-$xNames
-[1] "pOutput"   "pVarInput" "pLabor"    "land"     
-
-$homWeights
-     pOutput    pVarInput       pLabor 
-0.6723446781 0.3269168696 0.0007384522 
-
-$restrictGrad
-[1] TRUE
-
-$est
-
-Regression Data: 20 training points, in 3 variable(s)
-                     r_2     r_3      r_4
-Bandwidth(s): 0.01630222 21.3718 1.699412
-
-Kernel Regression Estimator: Local-Constant
-Bandwidth Type: Fixed
-
-Continuous Kernel Type: Second-Order Epanechnikov
-No. Continuous Explanatory Vars.: 3
-
-
-$grad
-         pOutput   pVarInput        pLabor        land
- [1,] -1.1479845  0.38360658  9.520206e-03  0.09743691
- [2,] -1.1393593  0.20703800  6.850352e-03  0.10179849
- [3,] -0.0579661  0.02558467  1.885318e-04  0.01580823
- [4,]  0.7253859 -0.78116754 -5.379665e-06  0.00000000
- [5,]  0.7024502 -0.73941060  6.856644e-06  0.00000000
- [6,]  4.1006848 -4.09389991 -4.013747e-05  0.19466313
- [7,]  5.2202281 -5.23177377 -7.435267e-05  0.13285615
- [8,]  2.8646694 -2.81181253  4.447016e-05  0.24941501
- [9,]  6.9406719 -6.73454853  2.420465e-04  0.15980084
-[10,] -5.5308766  5.13481084  1.754435e-04 19.43192457
-[11,] -1.8379614  1.33714446  1.941260e-03 13.07239452
-[12,] -0.8462923  0.44026197  1.656515e-03 22.51412887
-[13,] -2.5076579  2.22867300  4.035805e-04  1.09362478
-[14,] -2.5905486  2.32466529  3.456191e-04  1.42246502
-[15,] -2.7339886  2.49245634  3.819714e-04  0.89794785
-[16,]  0.5384236 -0.43420068 -1.727941e-04 -1.25872439
-[17,]  0.5183273 -0.41341936 -1.613216e-04 -1.25872439
-[18,] -4.5864638  3.67070274 -1.609360e-05  2.17238371
-[19,] -2.0002821  1.25979561  1.107406e-03  6.09546189
-[20,]  2.8374824 -2.52621949  1.073063e-03  3.52724720
-
-attr(,"class")
-[1] "npregHom"
-> all.equal( estResultEpa$grad[ , "pOutput" ] * germanFarms$pOutput +
-+    estResultEpa$grad[ , "pVarInput" ] * germanFarms$pVarInput,
-+    - estResultEpa$grad[ , "pLabor" ] * germanFarms$pLabor )
-[1] TRUE
-> estElaEpa <- elas( estResultEpa )
-> print( estElaEpa )
-        pOutput    pVarInput        pLabor          land
-1  -0.198347630  0.056800433  0.1415471966  0.0040904466
-2  -0.188672203  0.030078930  0.1585932730  0.0040633593
-3  -0.009387896  0.003664802  0.0057230947  0.0006423547
-4   0.105630860 -0.105499872 -0.0001309888  0.0000000000
-5   0.106927094 -0.107099334  0.0001722406  0.0000000000
-6   0.622227932 -0.621198411 -0.0010295208  0.0074523642
-7   0.852143470 -0.850046159 -0.0020973115  0.0052049374
-8   0.471440274 -0.472758394  0.0013181197  0.0099232175
-9   1.155281563 -1.162174578  0.0068930149  0.0062339981
-10 -0.877652869  0.872378126  0.0052747430  0.7687163708
-11 -0.270030948  0.214598716  0.0554322315  0.5157146557
-12 -0.104051670  0.058313133  0.0457385370  0.8761428380
-13 -0.299464200  0.287997040  0.0114671600  0.0438219918
-14 -0.323567252  0.313869440  0.0096978119  0.0589323818
-15 -0.358749995  0.347612880  0.0111371155  0.0366539624
-16  0.071562849 -0.065493797 -0.0060690520 -0.0564385691
-17  0.071597546 -0.065445309 -0.0061522379 -0.0595903397
-18 -0.579047892  0.579659425 -0.0006115331  0.1076705273
-19 -0.233140738  0.190234527  0.0429062114  0.3080445752
-20  0.334188666 -0.378523073  0.0443344065  0.1834373702
-> all.equal( estElaEpa[[ "pOutput" ]] + estElaEpa[[ "pVarInput" ]],
-+    - estElaEpa[[ "pLabor" ]] )
-[1] TRUE
-> estElaEpaObs <- elas( estResultEpa, yObs = TRUE )
-> print( estElaEpaObs )
-        pOutput    pVarInput        pLabor          land
-1  -0.198652338  0.056887692  0.1417646462  0.0040967305
-2  -0.188559661  0.030060988  0.1584986724  0.0040609355
-3  -0.009383276  0.003662998  0.0057202778  0.0006420386
-4   0.105236423 -0.105105923 -0.0001304997  0.0000000000
-5   0.107330276 -0.107503166  0.0001728901  0.0000000000
-6   0.624163195 -0.623130472 -0.0010327228  0.0074755427
-7   0.836825770 -0.834766159 -0.0020596113  0.0051113761
-8   0.474961302 -0.476289267  0.0013279643  0.0099973306
-9   1.165175540 -1.172127587  0.0069520475  0.0062873869
-10 -0.891904385  0.886543989  0.0053603954  0.7811989524
-11 -0.268523677  0.213400860  0.0551228175  0.5128360177
-12 -0.104954285  0.058818981  0.0461353044  0.8837431017
-13 -0.290166014  0.279054903  0.0111111115  0.0424613449
-14 -0.315120021  0.305675386  0.0094446353  0.0573938595
-15 -0.375881590  0.364212637  0.0116689526  0.0384043201
-16  0.070789464 -0.064786001 -0.0060034632 -0.0558286330
-17  0.072391269 -0.066170828 -0.0062204409 -0.0602509517
-18 -0.583656975  0.584273375 -0.0006164007  0.1085275589
-19 -0.235378796  0.192060702  0.0433180940  0.3110016803
-20  0.328653177 -0.372253230  0.0436000529  0.1803989199
-> all.equal( estElaEpaObs[[ "pOutput" ]] + estElaEpaObs[[ "pVarInput" ]],
-+    - estElaEpaObs[[ "pLabor" ]] )
-[1] TRUE
-> 
-> # estimation with Epanechnikov kernel (gradients not restricted)
-> npseed( 123 )
-> estResultEpaAll <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights, restrictGrad = FALSE,
-+    ckertype="epanechnikov" )
-Multistart 1 of 4 |Multistart 1 of 4 |Multistart 1 of 4 |Multistart 1 of 4 /Multistart 1 of 4 -Multistart 1 of 4 \Multistart 1 of 4 |Multistart 1 of 4 |Multistart 2 of 4 |Multistart 2 of 4 |Multistart 2 of 4 /Multistart 2 of 4 |Multistart 2 of 4 |Multistart 2 of 4 /Multistart 3 of 4 |Multistart 3 of 4 |Multistart 3 of 4 /Multistart 3 of 4 -Multistart 3 of 4 |Multistart 3 of 4 |Multistart 3 of 4 /Multistart 3 of 4 -Multistart 3 of 4 \Multistart 4 of 4 |Multistart 4 of 4 |Multistart 4 of 4 /Multistart 4 of 4 -Multistart 4 of 4 |Multistart 4 of 4 |                   > print( estResultEpaAll )
-$call
-npregHom(yName = "qVarInput", xNames = c("pOutput", "pVarInput", 
-    "pLabor", "land"), homWeights = weights, data = germanFarms, 
-    restrictGrad = FALSE, ckertype = "epanechnikov")
-
-$yName
-[1] "qVarInput"
-
-$xNames
-[1] "pOutput"   "pVarInput" "pLabor"    "land"     
-
-$homWeights
-     pOutput    pVarInput       pLabor 
-0.6723446781 0.3269168696 0.0007384522 
-
-$restrictGrad
-[1] FALSE
-
-$est
-
-Regression Data: 20 training points, in 4 variable(s)
-                     r_1        r_2      r_3      r_4
-Bandwidth(s): 0.01920081 0.01536006 23.29574 1.893435
-
-Kernel Regression Estimator: Local-Constant
-Bandwidth Type: Fixed
-
-Continuous Kernel Type: Second-Order Epanechnikov
-No. Continuous Explanatory Vars.: 4
-
-
-$grad
-            pOutput     pVarInput        pLabor          land
- [1,]  7.663378e-15 -1.382548e-14  4.863179e-17  2.636381e-15
- [2,] -3.192879e+00  3.471247e+00  1.054569e-03  5.741285e-01
- [3,]  5.441053e-02 -7.355179e-02  5.678120e-05  6.607128e-03
- [4,] -2.462912e+00  2.491236e+00  9.116727e-04  4.304087e-01
- [5,] -2.577404e+00  2.680272e+00  1.636580e-04  3.877954e-01
- [6,]  1.501184e+00 -1.500339e+00 -4.999187e-06  2.236435e-01
- [7,]  1.332031e+00 -1.338113e+00 -9.058929e-07  2.517239e-01
- [8,]  1.918005e+00 -1.905355e+00  1.587632e-04  1.907674e+00
- [9,]  1.038416e+00 -1.033497e+00  1.932815e-04  5.344562e-01
-[10,] -2.174449e+00  1.876230e+00  8.742679e-04  7.330673e+00
-[11,]  2.179399e+00 -2.262303e+00  1.501787e-03  5.630944e+00
-[12,]  3.914736e+00 -3.904422e+00  1.297573e-03  1.122753e+01
-[13,]  1.812754e+00 -1.498263e+00 -8.048269e-04 -8.922326e-01
-[14,]  4.991684e-01 -3.167516e-01 -6.978364e-04  1.422018e-01
-[15,] -2.631373e-01  2.331305e-01  6.909887e-05  5.753592e-01
-[16,]  4.753439e+00 -3.649283e+00 -2.315829e-03 -3.424505e+00
-[17,]  2.880558e+00 -2.134956e+00 -1.571416e-03 -3.649041e+00
-[18,] -8.018474e-01  5.092838e-01  5.476745e-04  2.228806e+00
-[19,]  3.986757e+00 -3.575912e+00  1.943636e-03  5.249225e+00
-[20,]  4.561353e+00 -3.903779e+00  1.154849e-03  2.502714e+00
-
-attr(,"class")
-[1] "npregHom"
-> all.equal( estResultEpaAll$grad[ , "pOutput" ] * germanFarms$pOutput +
-+    estResultEpaAll$grad[ , "pVarInput" ] * germanFarms$pVarInput,
-+    - estResultEpaAll$grad[ , "pLabor" ] * germanFarms$pLabor )
-[1] TRUE
-> estElaEpaAll <- elas( estResultEpaAll )
-> print( estElaEpaAll )
-         pOutput     pVarInput        pLabor          land
-1   1.326105e-15 -2.050277e-15  7.241722e-16  1.108465e-16
-2  -5.202565e-01  4.962331e-01  2.402342e-02  2.254971e-02
-3   8.809645e-03 -1.053283e-02  1.723186e-03  2.684020e-04
-4  -3.621933e-01  3.397758e-01  2.241753e-02  1.661873e-02
-5  -3.893193e-01  3.852397e-01  4.079550e-03  1.474579e-02
-6   2.289361e-01 -2.288072e-01 -1.288759e-04  8.605059e-03
-7   2.189729e-01 -2.189472e-01 -2.573334e-05  9.931418e-03
-8   3.148623e-01 -3.195564e-01  4.694125e-03  7.570993e-02
-9   1.709188e-01 -1.763618e-01  5.442934e-03  2.061731e-02
-10 -3.448570e-01  3.185865e-01  2.627057e-02  2.898379e-01
-11  3.248780e-01 -3.683885e-01  4.351043e-02  2.253938e-01
-12  4.844506e-01 -5.205115e-01  3.606093e-02  4.397666e-01
-13  2.194743e-01 -1.962899e-01 -2.318443e-02 -3.624683e-02
-14  6.297715e-02 -4.319868e-02 -1.977847e-02  5.950871e-03
-15 -3.456867e-02  3.255161e-02  2.017056e-03  2.351332e-02
-16  6.073830e-01 -5.291861e-01 -7.819694e-02 -1.476163e-01
-17  3.913318e-01 -3.323923e-01 -5.893947e-02 -1.699019e-01
-18 -1.007032e-01  8.000160e-02  2.070163e-02  1.098874e-01
-19  4.680851e-01 -5.439440e-01  7.585888e-02  2.672270e-01
-20  5.364694e-01 -5.841161e-01  4.764676e-02  1.299738e-01
-> all.equal( estElaEpaAll[[ "pOutput" ]] + estElaEpaAll[[ "pVarInput" ]],
-+    - estElaEpaAll[[ "pLabor" ]] )
-[1] TRUE
-> estElaEpaAllObs <- elas( estResultEpaAll, yObs = TRUE )
-> print( estElaEpaAllObs )
-         pOutput     pVarInput        pLabor          land
-1   1.326105e-15 -2.050277e-15  7.241722e-16  1.108465e-16
-2  -5.284094e-01  5.040095e-01  2.439989e-02  2.290308e-02
-3   8.807716e-03 -1.053052e-02  1.722809e-03  2.683432e-04
-4  -3.573106e-01  3.351953e-01  2.211532e-02  1.639470e-02
-5  -3.938123e-01  3.896857e-01  4.126631e-03  1.491597e-02
-6   2.284944e-01 -2.283658e-01 -1.286273e-04  8.588459e-03
-7   2.135305e-01 -2.135054e-01 -2.509375e-05  9.684578e-03
-8   3.180047e-01 -3.227457e-01  4.740973e-03  7.646553e-02
-9   1.743256e-01 -1.798770e-01  5.551423e-03  2.102826e-02
-10 -3.506498e-01  3.239379e-01  2.671185e-02  2.947065e-01
-11  3.184073e-01 -3.610511e-01  4.264381e-02  2.209045e-01
-12  4.854922e-01 -5.216306e-01  3.613846e-02  4.407121e-01
-13  2.097574e-01 -1.875994e-01 -2.215796e-02 -3.464204e-02
-14  6.071994e-02 -4.165036e-02 -1.906958e-02  5.737581e-03
-15 -3.617735e-02  3.406643e-02  2.110921e-03  2.460753e-02
-16  6.249604e-01 -5.445004e-01 -8.045992e-02 -1.518883e-01
-17  4.023081e-01 -3.417155e-01 -6.059264e-02 -1.746675e-01
-18 -1.020402e-01  8.106375e-02  2.097648e-02  1.113463e-01
-19  4.691328e-01 -5.451615e-01  7.602869e-02  2.678251e-01
-20  5.283216e-01 -5.752447e-01  4.692311e-02  1.279998e-01
-> all.equal( estElaEpaAllObs[[ "pOutput" ]] + estElaEpaAllObs[[ "pVarInput" ]],
-+    - estElaEpaAllObs[[ "pLabor" ]] )
-[1] TRUE
-> # different order of weights
-> npseed( 123 )
-> estResultEpaAll2 <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights[ c( 3, 2, 1 ) ],
-+    restrictGrad = FALSE, ckertype="epanechnikov" )
-Multistart 1 of 4 |Multistart 1 of 4 |Multistart 1 of 4 |Multistart 1 of 4 /Multistart 1 of 4 -Multistart 1 of 4 \Multistart 1 of 4 |Multistart 1 of 4 |Multistart 2 of 4 |Multistart 2 of 4 |Multistart 2 of 4 /Multistart 2 of 4 |Multistart 2 of 4 |Multistart 2 of 4 /Multistart 3 of 4 |Multistart 3 of 4 |Multistart 3 of 4 /Multistart 3 of 4 -Multistart 3 of 4 |Multistart 3 of 4 |Multistart 3 of 4 /Multistart 3 of 4 -Multistart 3 of 4 \Multistart 4 of 4 |Multistart 4 of 4 |Multistart 4 of 4 /Multistart 4 of 4 -Multistart 4 of 4 |Multistart 4 of 4 |                   > all.equal( estResultEpaAll$grad, estResultEpaAll2$grad, tolerance = 1e-6 )
-[1] TRUE
-> all.equal( elas( estResultEpaAll ), elas( estResultEpaAll2 ), tolerance = 1e-6 )
-[1] TRUE
-> all.equal( elas( estResultEpaAll, yObs = TRUE ),
-+    elas( estResultEpaAll2, yObs = TRUE ), tolerance = 1e-6 )
-[1] TRUE
-> 
-> 
-> # estimation with manual bandwidth selection (restricted gradients)
-> estResultMan <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights, bws = rep( 1, 3 ),
-+    bwscaling = TRUE )
-> print( estResultMan )
-$call
-npregHom(yName = "qVarInput", xNames = c("pOutput", "pVarInput", 
-    "pLabor", "land"), homWeights = weights, data = germanFarms, 
-    bws = rep(1, 3), bwscaling = TRUE)
-
-$yName
-[1] "qVarInput"
-
-$xNames
-[1] "pOutput"   "pVarInput" "pLabor"    "land"     
-
-$homWeights
-     pOutput    pVarInput       pLabor 
-0.6723446781 0.3269168696 0.0007384522 
-
-$restrictGrad
-[1] TRUE
-
-$est
-
-Regression Data: 20 training points, in 3 variable(s)
-                 r_2 r_3 r_4
-Scale Factor(s):   1   1   1
-
-Kernel Regression Estimator: Local-Constant
-Bandwidth Type: Fixed
-
-Continuous Kernel Type: Second-Order Gaussian
-No. Continuous Explanatory Vars.: 3
-
-
-$grad
-          pOutput    pVarInput        pLabor       land
- [1,] -1.57635057  0.991422639  8.444994e-03  0.9427534
- [2,] -2.83857697  2.491356228  4.669516e-03  1.4129624
- [3,] -2.07453689  2.347574461 -9.551493e-06  1.1601769
- [4,] -1.88147604  1.874236024  8.566194e-04  1.3011841
- [5,] -1.56251489  1.490158221  8.760078e-04  1.3927804
- [6,] -1.19646306  0.987039251  1.238894e-03  2.1214829
- [7,] -1.32680288  1.064882689  1.544478e-03  2.8041318
- [8,] -1.41264728  0.985799886  2.251467e-03  4.1378024
- [9,] -0.98861116  0.699349589  1.540456e-03  2.7604051
-[10,] -1.67048667  0.916369858  3.638438e-03  6.6809555
-[11,] -2.16768322  1.034593211  5.338201e-03  9.1186278
-[12,] -1.51283979  0.366407246  4.978857e-03  8.8944021
-[13,]  0.19848637 -0.405148424  1.008374e-03  3.5072734
-[14,]  0.26680945 -0.330454388  4.024227e-04  3.9637744
-[15,] -0.47136333  0.004351884  2.100518e-03  6.2566045
-[16,]  2.08861762 -1.221672685 -2.657166e-03 -1.5072291
-[17,]  2.42360642 -1.319516978 -3.301160e-03 -2.5632617
-[18,] -0.07368454 -0.151801658  8.756801e-04  2.0099016
-[19,] -0.83611942  0.049025389  2.324182e-03  3.9817589
-[20,] -0.44418364 -0.201890752  1.998397e-03  3.7651185
-
-attr(,"class")
-[1] "npregHom"
-> all.equal( estResultMan$grad[ , "pOutput" ] * germanFarms$pOutput +
-+    estResultMan$grad[ , "pVarInput" ] * germanFarms$pVarInput,
-+    - estResultMan$grad[ , "pLabor" ] * germanFarms$pLabor )
-[1] TRUE
-> estElaMan <- elas( estResultMan )
-> print( estElaMan )
-        pOutput     pVarInput        pLabor        land
-1  -0.266847248  0.1438279694  0.1230192789  0.03877611
-2  -0.455438713  0.3506955137  0.1047431995  0.05464577
-3  -0.321531669  0.3218091454 -0.0002774764  0.04511535
-4  -0.277237991  0.2561323163  0.0211056750  0.05034058
-5  -0.238645698  0.2165662011  0.0220794972  0.05354936
-6  -0.182704829  0.1507249513  0.0319798773  0.08173489
-7  -0.218169851  0.1742851592  0.0438846918  0.11066171
-8  -0.229500057  0.1636208083  0.0658792485  0.16251616
-9  -0.161399132  0.1183713416  0.0430277902  0.10562088
-10 -0.260775830  0.1531604481  0.1076153821  0.26000662
-11 -0.317754199  0.1656672800  0.1520869187  0.35892371
-12 -0.192929924  0.0503381482  0.1425917756  0.35901658
-13  0.024487127 -0.0540861833  0.0295990566  0.14518572
-14  0.034333887 -0.0459673092  0.0116334218  0.16918828
-15 -0.063569443  0.0006237966  0.0629456460  0.26248587
-16  0.265712392 -0.1763818449 -0.0893305472 -0.06468655
-17  0.323827575 -0.2020506976 -0.1217768773 -0.11738047
-18 -0.009157153 -0.0235965087  0.0327536616  0.09805791
-19 -0.097981138  0.0074431633  0.0905379752  0.20231550
-20 -0.052988941 -0.0306409226  0.0836298633  0.19833288
-> all.equal( estElaMan[[ "pOutput" ]] + estElaMan[[ "pVarInput" ]],
-+    - estElaMan[[ "pLabor" ]] )
-[1] TRUE
-> estElaManObs <- elas( estResultMan, yObs = TRUE )
-> print( estElaManObs )
-        pOutput     pVarInput        pLabor        land
-1  -0.272778711  0.1470249679  0.1257537432  0.03963803
-2  -0.469773762  0.3617337442  0.1080400183  0.05636576
-3  -0.335816113  0.3361059168 -0.0002898037  0.04711965
-4  -0.272957888  0.2521780499  0.0207798377  0.04956340
-5  -0.238743138  0.2166546253  0.0220885123  0.05357123
-6  -0.182113049  0.1502367545  0.0318762947  0.08147016
-7  -0.212692401  0.1699094935  0.0427829070  0.10788339
-8  -0.234216485  0.1669833603  0.0672331252  0.16585601
-9  -0.165964557  0.1217196585  0.0442448980  0.10860854
-10 -0.269381238  0.1582146286  0.1111666093  0.26858664
-11 -0.316695590  0.1651153541  0.1515802362  0.35772794
-12 -0.187617235  0.0489519925  0.1386652423  0.34913038
-13  0.022967247 -0.0507291352  0.0277618877  0.13617426
-14  0.032455287 -0.0434521792  0.0109968919  0.15993104
-15 -0.064805244  0.0006359233  0.0641693204  0.26758864
-16  0.274601855 -0.1822827359 -0.0923191191 -0.06685065
-17  0.338488728 -0.2111984556 -0.1272902728 -0.12269482
-18 -0.009376832 -0.0241625850  0.0335394165  0.10041030
-19 -0.098388514  0.0074741097  0.0909144041  0.20315666
-20 -0.051447849 -0.0297497841  0.0811976328  0.19256471
-> all.equal( estElaManObs[[ "pOutput" ]] + estElaManObs[[ "pVarInput" ]],
-+    - estElaManObs[[ "pLabor" ]] )
-[1] TRUE
-> # different normalized variable omitted
-> estResultMan2 <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights[ c( 3, 2, 1 ) ],
-+    bws = rep( 1, 3 ), bwscaling = TRUE )
-> print( estResultMan2 )
-$call
-npregHom(yName = "qVarInput", xNames = c("pOutput", "pVarInput", 
-    "pLabor", "land"), homWeights = weights[c(3, 2, 1)], data = germanFarms, 
-    bws = rep(1, 3), bwscaling = TRUE)
-
-$yName
-[1] "qVarInput"
-
-$xNames
-[1] "pOutput"   "pVarInput" "pLabor"    "land"     
-
-$homWeights
-      pLabor    pVarInput      pOutput 
-0.0007384522 0.3269168696 0.6723446781 
-
-$restrictGrad
-[1] TRUE
-
-$est
-
-Regression Data: 20 training points, in 3 variable(s)
-                 r_1 r_2 r_4
-Scale Factor(s):   1   1   1
-
-Kernel Regression Estimator: Local-Constant
-Bandwidth Type: Fixed
-
-Continuous Kernel Type: Second-Order Gaussian
-No. Continuous Explanatory Vars.: 3
-
-
-$grad
-         pOutput   pVarInput        pLabor        land
- [1,] -0.3346884 -0.16425801  0.0055251735  0.33621380
- [2,] -0.4521373 -0.22115739  0.0046218903  1.29140243
- [3,] -0.3296662 -0.16102865  0.0025186722  4.35090056
- [4,] -0.1987278 -0.09712347  0.0017272135  1.63559747
- [5,] -0.1973915 -0.09648024  0.0017524333  1.47173270
- [6,] -0.2028850 -0.09916195  0.0017868264  1.60810292
- [7,] -0.2385393 -0.11657709  0.0020519292  2.15194813
- [8,] -0.2846660 -0.13910014  0.0023695569  2.81273632
- [9,] -0.1843323 -0.09009408  0.0016233456  1.59472959
-[10,] -0.3904939 -0.19078525  0.0031391107  3.91699187
-[11,] -0.6714398 -0.32802679  0.0052983172  5.75167024
-[12,] -1.3702067 -0.66902722  0.0093106917  9.79732005
-[13,]  0.1310055  0.06395225 -0.0008414572  2.00652032
-[14,] -0.1091054 -0.05327333  0.0007420158  4.20519692
-[15,] -0.4587158 -0.22398179  0.0031357844  6.03653634
-[16,]  1.1869787  0.57928217 -0.0069794947 -2.61385366
-[17,]  1.1183006  0.54569804 -0.0063156941 -2.77990043
-[18,]  0.2089895  0.10196293 -0.0011181149  0.09287105
-[19,] -0.9947068 -0.48520235  0.0048833544  4.12096811
-[20,] -0.7239911 -0.35309920  0.0033444087  3.16663946
-
-attr(,"class")
-[1] "npregHom"
-> all.equal( estResultMan2$grad[ , "pOutput" ] * germanFarms$pOutput +
-+    estResultMan2$grad[ , "pVarInput" ] * germanFarms$pVarInput,
-+    - estResultMan2$grad[ , "pLabor" ] * germanFarms$pLabor )
-[1] TRUE
-> estElaMan2 <- elas( estResultMan2 )
-> print( estElaMan2 )
-       pOutput    pVarInput      pLabor        land
-1  -0.05754522 -0.024203031  0.08174825  0.01404560
-2  -0.07075465 -0.030363457  0.10111811  0.04871278
-3  -0.04964070 -0.021445841  0.07108654  0.16437666
-4  -0.02901872 -0.013153152  0.04217187  0.06270778
-5  -0.03009263 -0.013995840  0.04408847  0.05648107
-6  -0.03121997 -0.015259055  0.04647902  0.06243292
-7  -0.03949584 -0.019212103  0.05870794  0.08551333
-8  -0.04678445 -0.023355771  0.07014022  0.11175648
-9  -0.03047852 -0.015444193  0.04592271  0.06179890
-10 -0.06225251 -0.032564092  0.09481660  0.15567427
-11 -0.10125263 -0.054035622  0.15528825  0.23290047
-12 -0.17433694 -0.091700910  0.26603785  0.39454971
-13  0.01611640  0.008513326 -0.02462972  0.08282647
-14 -0.01399777 -0.007388189  0.02138596  0.17895272
-15 -0.06169056 -0.032015536  0.09370609  0.25254420
-16  0.15138516  0.083844903 -0.23523006 -0.11246139
-17  0.15059925  0.084219036 -0.23481828 -0.12830531
-18  0.02600418  0.015868949 -0.04187313  0.00453652
-19 -0.11677075 -0.073794539  0.19056529  0.20975788
-20 -0.08603613 -0.053383508  0.13941964  0.16616504
-> all.equal( estElaMan2[[ "pOutput" ]] + estElaMan2[[ "pVarInput" ]],
-+    - estElaMan2[[ "pLabor" ]] )
-[1] TRUE
-> estElaMan2Obs <- elas( estResultMan2, yObs = TRUE )
-> print( estElaMan2Obs )
-       pOutput    pVarInput      pLabor         land
-1  -0.05791596 -0.024358965  0.08227493  0.014136094
-2  -0.07482702 -0.032111061  0.10693808  0.051516500
-3  -0.05336479 -0.023054724  0.07641951  0.176708324
-4  -0.02883073 -0.013067942  0.04189867  0.062301543
-5  -0.03016026 -0.014027295  0.04418755  0.056608010
-6  -0.03088102 -0.015093391  0.04597441  0.061755104
-7  -0.03823891 -0.018600691  0.05683960  0.082791924
-8  -0.04719753 -0.023561992  0.07075952  0.112743235
-9  -0.03094506 -0.015680599  0.04662566  0.062744864
-10 -0.06297070 -0.032939775  0.09591048  0.157470246
-11 -0.09809646 -0.052351261  0.15044772  0.225640655
-12 -0.16992836 -0.089382008  0.25931037  0.384572464
-13  0.01515890  0.008007540 -0.02316644  0.077905652
-14 -0.01327183 -0.007005028  0.02027685  0.169671997
-15 -0.06306641 -0.032729559  0.09579596  0.258176546
-16  0.15605851  0.086433248 -0.24249176 -0.115933144
-17  0.15618549  0.087343009 -0.24352850 -0.133064591
-18  0.02659526  0.016229652 -0.04282491  0.004639635
-19 -0.11704993 -0.073970970  0.19102090  0.210259375
-20 -0.08385672 -0.052031234  0.13588795  0.161955856
-> all.equal( estElaMan2Obs[[ "pOutput" ]] + estElaMan2Obs[[ "pVarInput" ]],
-+    - estElaMan2Obs[[ "pLabor" ]] )
-[1] TRUE
-> 
-> # estimation with manual bandwidth selection (gradients not restricted)
-> estResultManAll <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights, restrictGrad = FALSE,
-+    bws = rep( 1, 4 ), bwscaling = TRUE )
-> print( estResultManAll )
-$call
-npregHom(yName = "qVarInput", xNames = c("pOutput", "pVarInput", 
-    "pLabor", "land"), homWeights = weights, data = germanFarms, 
-    restrictGrad = FALSE, bws = rep(1, 4), bwscaling = TRUE)
-
-$yName
-[1] "qVarInput"
-
-$xNames
-[1] "pOutput"   "pVarInput" "pLabor"    "land"     
-
-$homWeights
-     pOutput    pVarInput       pLabor 
-0.6723446781 0.3269168696 0.0007384522 
-
-$restrictGrad
-[1] FALSE
-
-$est
-
-Regression Data: 20 training points, in 4 variable(s)
-                 r_1 r_2 r_3 r_4
-Scale Factor(s):   1   1   1   1
-
-Kernel Regression Estimator: Local-Constant
-Bandwidth Type: Fixed
-
-Continuous Kernel Type: Second-Order Gaussian
-No. Continuous Explanatory Vars.: 4
-
-
-$grad
-          pOutput  pVarInput        pLabor       land
- [1,]  0.34834994 -0.8642949  0.0045593069  0.5745809
- [2,] -3.70641516  3.6167963  0.0038144081  0.9491543
- [3,] -4.37417241  5.0097219 -0.0003025467  0.2530275
- [4,] -5.16944274  5.3649943  0.0011586154  0.8182849
- [5,] -3.21017620  3.2014644  0.0009928279  0.9360419
- [6,] -0.65757961  0.4535162  0.0012071827  1.9010838
- [7,] -1.06085817  0.8006586  0.0015273908  2.5305005
- [8,] -0.80729418  0.3623389  0.0024269373  4.1901877
- [9,] -0.34619642  0.0750514  0.0015686874  2.6616786
-[10,] -0.33120027 -0.3093311  0.0034960514  6.1612418
-[11,]  0.44466963 -1.2031047  0.0044740813  7.4517976
-[12,]  1.12027668 -1.9079057  0.0041637277  7.2835521
-[13,]  1.61654307 -1.6304094  0.0006208271  2.4557501
-[14,]  1.43550254 -1.4436977  0.0005568663  3.3261268
-[15,]  0.68875524 -1.0476392  0.0019114690  4.9280135
-[16,]  3.48917364 -2.5082975 -0.0024316441 -1.3988396
-[17,]  3.58501496 -2.4524342 -0.0028051517 -2.1668603
-[18,]  0.08011058 -0.4176700  0.0014695915  2.4549355
-[19,]  1.12577801 -1.4404042  0.0022272236  3.3025005
-[20,]  1.73656548 -1.9396437  0.0020840803  3.3271347
-
-attr(,"class")
-[1] "npregHom"
-> all.equal( estResultManAll$grad[ , "pOutput" ] * germanFarms$pOutput +
-+    estResultManAll$grad[ , "pVarInput" ] * germanFarms$pVarInput,
-+    - estResultManAll$grad[ , "pLabor" ] * germanFarms$pLabor )
-[1] TRUE
-> estElaManAll <- elas( estResultManAll )
-> print( estElaManAll )
-        pOutput   pVarInput       pLabor        land
-1   0.059440297 -0.12638681  0.066946516  0.02382170
-2  -0.599667073  0.51338751  0.086279565  0.03701601
-3  -0.696067689  0.70509171 -0.009024023  0.01010231
-4  -0.762893305  0.73430314  0.028590165  0.03170663
-5  -0.487818457  0.46292099  0.024897462  0.03580691
-6  -0.099928249  0.06891802  0.031010231  0.07288840
-7  -0.173569097  0.13038654  0.043182559  0.09936470
-8  -0.130623181  0.05989687  0.070726311  0.16390781
-9  -0.056415164  0.01267969  0.043735473  0.10165533
-10 -0.051614215 -0.05161237  0.103226580  0.23936927
-11  0.065292779 -0.19297576  0.127682979  0.29380955
-12  0.142062243 -0.26063744  0.118575192  0.29233963
-13  0.198573282 -0.21671813  0.018144848  0.10121965
-14  0.184348759 -0.20041411  0.016065356  0.14168198
-15  0.092527878 -0.14958654  0.057058665  0.20594639
-16  0.444054078 -0.36227508 -0.081778997 -0.06005692
-17  0.478718872 -0.37530173 -0.103417139 -0.09916802
-18  0.009969622 -0.06501436  0.055044737  0.11993687
-19  0.132198931 -0.21914012  0.086941185  0.16815048
-20  0.206493825 -0.29342735  0.086933527  0.17469468
-> all.equal( estElaManAll[[ "pOutput" ]] + estElaManAll[[ "pVarInput" ]],
-+    - estElaManAll[[ "pLabor" ]] )
-[1] TRUE
-> estElaManAllObs <- elas( estResultManAll, yObs = TRUE )
-> print( estElaManAllObs )
-       pOutput   pVarInput       pLabor        land
-1   0.06028002 -0.12817231  0.067892284  0.02415823
-2  -0.61339770  0.52514259  0.088255116  0.03786357
-3  -0.70807012  0.71724974 -0.009179626  0.01027651
-4  -0.74996447  0.72185882  0.028105644  0.03116929
-5  -0.49049615  0.46546202  0.025034127  0.03600346
-6  -0.10008987  0.06902948  0.031060385  0.07300629
-7  -0.17006028  0.12775069  0.042309594  0.09735597
-8  -0.13384913  0.06137612  0.072473009  0.16795578
-9  -0.05811824  0.01306247  0.045055768  0.10472412
-10 -0.05340907 -0.05340716  0.106816227  0.24769320
-11  0.06496563 -0.19200886  0.127043228  0.29233743
-12  0.13893290 -0.25489611  0.115963218  0.28589998
-13  0.18705337 -0.20414557  0.017092203  0.09534756
-14  0.17461768 -0.18983501  0.015217326  0.13420313
-15  0.09469330 -0.15308731  0.058394006  0.21076615
-16  0.45874053 -0.37425681 -0.084483720 -0.06204321
-17  0.50069481 -0.39253023 -0.108164578 -0.10372040
-18  0.01019459 -0.06648140  0.056286814  0.12264323
-19  0.13247345 -0.21959517  0.087121724  0.16849965
-20  0.20113879 -0.28581785  0.084679065  0.17016429
-> all.equal( estElaManAllObs[[ "pOutput" ]] + estElaManAllObs[[ "pVarInput" ]],
-+    - estElaManAllObs[[ "pLabor" ]] )
-[1] TRUE
-> # different order of weights
-> estResultManAll2 <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights[ c( 3, 2, 1 ) ],
-+    restrictGrad = FALSE, bws = rep( 1, 4 ), bwscaling = TRUE )
-> all.equal( estResultManAll$grad, estResultManAll2$grad )
-[1] TRUE
-> all.equal( elas( estResultManAll ), elas( estResultManAll2 ) )
-[1] TRUE
-> all.equal( elas( estResultManAll, yObs = TRUE ),
-+    elas( estResultManAll2, yObs = TRUE ) )
-[1] TRUE
-> 
-> 
-> # local-linear estimation (restricted gradients)
-> npseed( 123 )
-> estResultLl <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights, regtype = "ll" )
-Multistart 1 of 3 |Multistart 1 of 3 |Multistart 1 of 3 |Multistart 1 of 3 /Multistart 1 of 3 -Multistart 1 of 3 |Multistart 1 of 3 |Multistart 2 of 3 |Multistart 2 of 3 |Multistart 2 of 3 /Multistart 2 of 3 -Multistart 2 of 3 |Multistart 2 of 3 |Multistart 2 of 3 /Multistart 3 of 3 |Multistart 3 of 3 |Multistart 3 of 3 /Multistart 3 of 3 -Multistart 3 of 3 |Multistart 3 of 3 |                   > print( estResultLl )
-$call
-npregHom(yName = "qVarInput", xNames = c("pOutput", "pVarInput", 
-    "pLabor", "land"), homWeights = weights, data = germanFarms, 
-    regtype = "ll")
-
-$yName
-[1] "qVarInput"
-
-$xNames
-[1] "pOutput"   "pVarInput" "pLabor"    "land"     
-
-$homWeights
-     pOutput    pVarInput       pLabor 
-0.6723446781 0.3269168696 0.0007384522 
-
-$restrictGrad
-[1] TRUE
-
-$est
-
-Regression Data: 20 training points, in 3 variable(s)
-                   r_2      r_3     r_4
-Bandwidth(s): 209285.7 26.86981 4020900
-
-Kernel Regression Estimator: Local-Linear
-Bandwidth Type: Fixed
-
-Continuous Kernel Type: Second-Order Gaussian
-No. Continuous Explanatory Vars.: 3
-
-
-$grad
-          pOutput   pVarInput       pLabor     land
- [1,] -0.76446447  0.08646379  0.008022607 16.75335
- [2,] -0.93577044  0.46674082  0.003764389 16.69187
- [3,]  0.98726335  0.77241020 -0.008911999 24.62731
- [4,] -0.28484455  0.81864200 -0.002837166 20.72296
- [5,] -0.41435221  0.74977691 -0.001812405 20.14118
- [6,] -0.37261020  0.73133585 -0.002122122 20.36596
- [7,] -0.20229341  0.70107438 -0.002867551 21.01374
- [8,]  0.01721473  0.71225131 -0.004135753 21.92980
- [9,] -0.35399739  0.66684510 -0.001971820 20.37073
-[10,]  0.29925110  0.71513173 -0.005620558 22.95124
-[11,]  0.50010328  0.73419301 -0.006699596 23.53564
-[12,]  3.21487213  0.32047216 -0.015852768 29.56320
-[13,]  4.52863443 -0.01565951 -0.018962260 31.31578
-[14,]  3.10575237  0.31656648 -0.015348225 29.52962
-[15,]  2.87498261  0.32786317 -0.014506902 29.31902
-[16,]  5.80293344 -0.48688572 -0.019868376 31.12919
-[17,]  5.98642012 -0.69991360 -0.018777758 30.19978
-[18,]  7.15001082 -1.23736627 -0.018613895 29.55206
-[19,]  8.47071160 -2.18735338 -0.016956983 30.35265
-[20,]  8.27050160 -2.26356284 -0.015367106 30.47398
-
-attr(,"class")
-[1] "npregHom"
-> all.equal( estResultLl$grad[ , "pOutput" ] * germanFarms$pOutput +
-+    estResultLl$grad[ , "pVarInput" ] * germanFarms$pVarInput,
-+    - estResultLl$grad[ , "pLabor" ] * germanFarms$pLabor )
-[1] TRUE
-> estElaLl <- elas( estResultLl )
-> print( estElaLl )
-       pOutput    pVarInput      pLabor      land
-1  -0.13228804  0.012822483  0.11946555 0.7044029
-2  -0.15355226  0.067193582  0.08635868 0.6602200
-3   0.15828137  0.109527001 -0.26780837 0.9906296
-4  -0.04255903  0.113439399 -0.07088036 0.8129447
-5  -0.06437051  0.110835334 -0.04646482 0.7876703
-6  -0.05764517  0.113142319 -0.05549715 0.7949328
-7  -0.03310752  0.114203494 -0.08109597 0.8253896
-8   0.00279911  0.118318776 -0.12111789 0.8620494
-9  -0.05872866  0.114696876 -0.05596821 0.7920596
-10  0.04732389  0.121082737 -0.16840663 0.9048412
-11  0.07381938  0.118383886 -0.19220327 0.9328546
-12  0.42394354  0.045526174 -0.46946971 1.2339196
-13  0.57605285 -0.002155452 -0.57389740 1.3366122
-14  0.38434185  0.042347869 -0.42668972 1.2121275
-15  0.37961529  0.046012328 -0.42562762 1.2042940
-16  0.78412703 -0.074664133 -0.70946290 1.4190200
-17  0.80603325 -0.108000020 -0.69803323 1.3936082
-18  0.89031628 -0.192718346 -0.69759794 1.4446053
-19  1.00467336 -0.336113747 -0.66855961 1.5609233
-20  0.95960910 -0.334131789 -0.62547731 1.5612955
-> all.equal( estElaLl[[ "pOutput" ]] + estElaLl[[ "pVarInput" ]],
-+    - estElaLl[[ "pLabor" ]] )
-[1] TRUE
-> estElaLlObs <- elas( estResultLl, yObs = TRUE )
-> print( estElaLlObs )
-        pOutput    pVarInput      pLabor      land
-1  -0.132286331  0.012822317  0.11946401 0.7043938
-2  -0.154866471  0.067768673  0.08709780 0.6658706
-3   0.159813472  0.110587179 -0.27040065 1.0002185
-4  -0.041324240  0.110148103 -0.06882386 0.7893582
-5  -0.063310594  0.109010327 -0.04569973 0.7747005
-6  -0.056714814  0.111316267 -0.05460145 0.7821030
-7  -0.032428532  0.111861330 -0.07943280 0.8084619
-8   0.002854197  0.120647322 -0.12350152 0.8790147
-9  -0.059427834  0.116062351 -0.05663452 0.8014891
-10  0.048256975  0.123470125 -0.17172710 0.9226819
-11  0.073064413  0.117173143 -0.19023756 0.9233140
-12  0.398697485  0.042815067 -0.44151255 1.1604391
-13  0.524017169 -0.001960747 -0.52205642 1.2158741
-14  0.377790542  0.041626028 -0.41941657 1.1914662
-15  0.395266108  0.047909329 -0.44317544 1.2539447
-16  0.762943044 -0.072647005 -0.69029604 1.3806837
-17  0.836082838 -0.112026350 -0.72405649 1.4455631
-18  0.909884801 -0.196954159 -0.71293064 1.4763567
-19  0.996772353 -0.333470464 -0.66330189 1.5486478
-20  0.957936035 -0.333549236 -0.62438680 1.5585734
-> all.equal( estElaLlObs[[ "pOutput" ]] + estElaLlObs[[ "pVarInput" ]],
-+    - estElaLlObs[[ "pLabor" ]] )
-[1] TRUE
-> 
-> # local-linear estimation (gradients not restricted)
-> npseed( 123 )
-> estResultLlAll <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights, restrictGrad = FALSE,
-+    regtype = "ll" )
-Multistart 1 of 4 |Multistart 1 of 4 |Multistart 1 of 4 |Multistart 1 of 4 /Multistart 1 of 4 |Multistart 1 of 4 |Multistart 1 of 4 /Multistart 1 of 4 -Multistart 1 of 4 \Multistart 1 of 4 |Multistart 2 of 4 |Multistart 2 of 4 |Multistart 2 of 4 /Multistart 2 of 4 |Multistart 2 of 4 |Multistart 3 of 4 |Multistart 3 of 4 |Multistart 3 of 4 /Multistart 3 of 4 |Multistart 3 of 4 |Multistart 3 of 4 /Multistart 4 of 4 |Multistart 4 of 4 |Multistart 4 of 4 /Multistart 4 of 4 |Multistart 4 of 4 |                   > print( estResultLlAll )
-$call
-npregHom(yName = "qVarInput", xNames = c("pOutput", "pVarInput", 
-    "pLabor", "land"), homWeights = weights, data = germanFarms, 
-    restrictGrad = FALSE, regtype = "ll")
-
-$yName
-[1] "qVarInput"
-
-$xNames
-[1] "pOutput"   "pVarInput" "pLabor"    "land"     
-
-$homWeights
-     pOutput    pVarInput       pLabor 
-0.6723446781 0.3269168696 0.0007384522 
-
-$restrictGrad
-[1] FALSE
-
-$est
-
-Regression Data: 20 training points, in 4 variable(s)
-                    r_1        r_2      r_3      r_4
-Bandwidth(s): 0.2058826 0.01618215 7.925724 1.129897
-
-Kernel Regression Estimator: Local-Linear
-Bandwidth Type: Fixed
-
-Continuous Kernel Type: Second-Order Gaussian
-No. Continuous Explanatory Vars.: 4
-
-
-$grad
-          pOutput  pVarInput      pLabor       land
- [1,]   64.698880  -66.40367 -0.09054636 102.528522
- [2,]  383.702910  221.57752 -4.13503001  37.286425
- [3,] -711.360096  567.51421  1.11728227 140.609709
- [4,]   -2.814086   19.49261 -0.09128832  28.715680
- [5,]  -82.832063   58.85314  0.16258501  23.745458
- [6,]  381.884466 -267.05573 -0.67929515  47.844183
- [7,] -541.404761  394.36351  0.86157546  47.521460
- [8,]  -73.552922   51.87862  0.11410518  48.109509
- [9,]  103.501165  -60.55665 -0.23799600  35.478793
-[10,]  142.720687  -86.69336 -0.26337788  58.659112
-[11,]   95.667310  -68.83502 -0.10534028  56.556658
-[12,]  -59.445653   37.33751  0.08559738  10.290397
-[13,] -401.290374  271.78539  0.45052335   1.885715
-[14,]   45.603549  -12.10473 -0.14475353   9.818262
-[15,] -258.515624  115.74901  0.60976896  10.831914
-[16,]   47.812939  -35.40896 -0.02886712  -5.962144
-[17,] -524.623108  382.14596  0.31393950  14.272140
-[18,]  -94.150037   31.97532  0.17993315 -45.800533
-[19,] -167.249024   51.03820  0.30420968  11.569905
-[20,]  -41.048108  -14.65643  0.17016730  11.580261
-
-attr(,"class")
-[1] "npregHom"
-> all.equal( estResultLlAll$grad[ , "pOutput" ] * germanFarms$pOutput +
-+    estResultLlAll$grad[ , "pVarInput" ] * germanFarms$pVarInput,
-+    - estResultLlAll$grad[ , "pLabor" ] * germanFarms$pLabor )
-[1] TRUE
-> estElaLlAll <- elas( estResultLlAll )
-> print( estElaLlAll )
-        pOutput  pVarInput      pLabor        land
-1    11.1957819  -9.847463   -1.348319  4.31080726
-2    85.6842437  43.410690 -129.094933  2.00702731
-3  -115.1534691  81.253238   33.900231  5.71084425
-4    -0.4519333   2.903306   -2.451373  1.21082525
-5   -13.0462795   8.820367    4.225912  0.94147973
-6    61.1395184 -42.755494  -18.384024  1.93257524
-7   -86.4710277  62.692499   23.778529  1.82158288
-8   -12.4724962   8.987576    3.484920  1.97225071
-9    18.4160632 -11.170947   -7.245116  1.47952288
-10   19.4831967 -12.670992   -6.812205  1.99632057
-11   12.3826122  -9.732620   -2.649992  1.96566551
-12   -6.6131432   4.474657    2.138486  0.36233565
-13  -60.7949756  44.555375   16.239601  0.09585884
-14    5.4258893  -1.556837   -3.869053  0.38747750
-15  -28.5672578  13.594778   14.972480  0.37235875
-16    6.2796808  -5.277781   -1.001899 -0.26416571
-17  -67.1469715  56.053396   11.093576  0.62606476
-18  -11.9943037   5.095147    6.899157 -2.29059792
-19  -19.7761374   7.818718   11.957419  0.59318165
-20   -4.7602610  -2.162362    6.922623  0.59299270
-> all.equal( estElaLlAll[[ "pOutput" ]] + estElaLlAll[[ "pVarInput" ]],
-+    - estElaLlAll[[ "pLabor" ]] )
-[1] TRUE
-> estElaLlAllObs <- elas( estResultLlAll, yObs = TRUE )
-> print( estElaLlAllObs )
-        pOutput  pVarInput     pLabor        land
-1    11.1957819  -9.847463  -1.348319  4.31080727
-2    63.5013816  32.172062 -95.673443  1.48742641
-3  -115.1515715  81.251899  33.899672  5.71075014
-4    -0.4082577   2.622726  -2.214468  1.09380897
-5   -12.6562549   8.556678   4.099576  0.91333375
-6    58.1264450 -40.648421 -17.478024  1.83733420
-7   -86.7895900  62.923460  23.866130  1.82829366
-8   -12.1950519   8.787652   3.407400  1.92837901
-9    17.3754108 -10.539700  -6.835710  1.39591819
-10   23.0150147 -14.967927  -8.047088  2.35820374
-11   13.9768648 -10.985688  -2.991177  2.21874357
-12   -7.3722473   4.988290   2.383957  0.40392714
-13  -46.4340960  34.030584  12.403512  0.07321523
-14    5.5473159  -1.591677  -3.955639  0.39614890
-15  -35.5419418  16.913938  18.628004  0.46326998
-16    6.2862257  -5.283282  -1.002944 -0.26444103
-17  -73.2705638  61.165289  12.105275  0.68315989
-18  -11.9811969   5.089579   6.891618 -2.28809486
-19  -19.6806609   7.780970  11.899691  0.59031785
-20   -4.7544229  -2.159710   6.914133  0.59226544
-> all.equal( estElaLlAllObs[[ "pOutput" ]] + estElaLlAllObs[[ "pVarInput" ]],
-+    - estElaLlAllObs[[ "pLabor" ]] )
-[1] TRUE
-> 
-> 
-> # local-linear estimation with Epanechnikov kernel (restricted gradients)
-> npseed( 123 )
-> estResultLlEpa <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights, ckertype="epanechnikov",
-+    regtype = "ll" )
-Multistart 1 of 3 |Multistart 1 of 3 |Multistart 1 of 3 |Multistart 1 of 3 /Multistart 1 of 3 |Multistart 1 of 3 |Multistart 1 of 3 /Multistart 1 of 3 -Multistart 1 of 3 \Multistart 2 of 3 |Multistart 2 of 3 |Multistart 2 of 3 /Multistart 2 of 3 |Multistart 2 of 3 |Multistart 2 of 3 /Multistart 2 of 3 -Multistart 3 of 3 |Multistart 3 of 3 |Multistart 3 of 3 /Multistart 3 of 3 -Multistart 3 of 3 \Multistart 3 of 3 |Multistart 3 of 3 |Multistart 3 of 3 /Multistart 3 of 3 -                   > print( estResultLlEpa )
-$call
-npregHom(yName = "qVarInput", xNames = c("pOutput", "pVarInput", 
-    "pLabor", "land"), homWeights = weights, data = germanFarms, 
-    ckertype = "epanechnikov", regtype = "ll")
-
-$yName
-[1] "qVarInput"
-
-$xNames
-[1] "pOutput"   "pVarInput" "pLabor"    "land"     
-
-$homWeights
-     pOutput    pVarInput       pLabor 
-0.6723446781 0.3269168696 0.0007384522 
-
-$restrictGrad
-[1] TRUE
-
-$est
-
-Regression Data: 20 training points, in 3 variable(s)
-                    r_2      r_3      r_4
-Bandwidth(s): 0.1463722 30.83798 6.641194
-
-Kernel Regression Estimator: Local-Linear
-Bandwidth Type: Fixed
-
-Continuous Kernel Type: Second-Order Epanechnikov
-No. Continuous Explanatory Vars.: 3
-
-
-$grad
-          pOutput   pVarInput        pLabor      land
- [1,]  4.54222887 -4.66311105 -0.0063449573 113.44302
- [2,] -1.28065772  0.86626932  0.0037240985  16.58263
- [3,]  0.29884529  1.08724940 -0.0067248139  22.86029
- [4,] -0.51957714  0.89387390 -0.0018506144  20.89360
- [5,] -0.75295891  0.77374083  0.0001012600  19.65599
- [6,] -0.58201358  0.68636813 -0.0006173328  20.24019
- [7,] -0.13715968  0.71597204 -0.0033302945  22.16853
- [8,]  0.09669662  0.76572512 -0.0048803777  22.81592
- [9,] -0.48420238  0.57664221 -0.0006641827  20.38637
-[10,]  0.46346570  0.76418986 -0.0067644952  23.86388
-[11,]  0.84981767  0.73800683 -0.0085203665  24.72933
-[12,]  3.47935282  0.10670770 -0.0160050465  29.64078
-[13,]  4.95555309 -0.45533297 -0.0187569494  31.83173
-[14,]  3.68521593 -0.06450621 -0.0160939830  30.08040
-[15,]  3.25176415  0.08516683 -0.0150416918  29.62279
-[16,]  6.11055096 -1.08539294 -0.0184621362  31.36599
-[17,]  6.20969454 -1.29065215 -0.0171343438  28.86470
-[18,]  7.34420318 -2.93624196 -0.0121988824  23.28024
-[19,]  8.70528939 -3.48776166 -0.0125944305  26.33924
-[20,]  9.32469803 -2.18904097 -0.0186425104  33.92783
-
-attr(,"class")
-[1] "npregHom"
-> all.equal( estResultLlEpa$grad[ , "pOutput" ] * germanFarms$pOutput +
-+    estResultLlEpa$grad[ , "pVarInput" ] * germanFarms$pVarInput,
-+    - estResultLlEpa$grad[ , "pLabor" ] * germanFarms$pLabor )
-[1] TRUE
-> estElaLlEpa <- elas( estResultLlEpa )
-> print( estElaLlEpa )
-       pOutput    pVarInput      pLabor      land
-1   0.78609706 -0.691604027 -0.09449303 4.7702504
-2  -0.21179470  0.125689808  0.08610489 0.6610466
-3   0.04796122  0.154329666 -0.20229089 0.9204983
-4  -0.07778237  0.124106191 -0.04632382 0.8212396
-5  -0.11730076  0.114697488  0.00260327 0.7708444
-6  -0.09018328  0.106353066 -0.01616979 0.7912700
-7  -0.02242124  0.116492923 -0.09407168 0.8697225
-8   0.01571305  0.127122580 -0.14283563 0.8963234
-9  -0.08046762  0.099352142 -0.01888452 0.7940271
-10  0.07334709  0.129484589 -0.20283168 0.9415164
-11  0.12569625  0.119241817 -0.24493807 0.9821685
-12  0.46148602  0.015246928 -0.47673295 1.2443450
-13  0.63308834 -0.062945739 -0.57014260 1.3645192
-14  0.45815261 -0.008668911 -0.44948370 1.2404248
-15  0.43135464  0.012007677 -0.44336231 1.2224076
-16  0.82593167 -0.166493348 -0.65943832 1.4302255
-17  0.83282241 -0.198374121 -0.63444829 1.3267843
-18  0.91724712 -0.458691492 -0.45855563 1.1414395
-19  1.03711087 -0.538333129 -0.49877774 1.3605835
-20  1.08278739 -0.323388845 -0.75939855 1.7396339
-> all.equal( estElaLlEpa[[ "pOutput" ]] + estElaLlEpa[[ "pVarInput" ]],
-+    - estElaLlEpa[[ "pLabor" ]] )
-[1] TRUE
-> estElaLlEpaObs <- elas( estResultLlEpa, yObs = TRUE )
-> print( estElaLlEpaObs )
-       pOutput    pVarInput       pLabor      land
-1   0.78600748 -0.691525214 -0.094482265 4.7697068
-2  -0.21194401  0.125778417  0.086165596 0.6615126
-3   0.04837565  0.155663201 -0.204038848 0.9284522
-4  -0.07537841  0.120270539 -0.044892125 0.7958582
-5  -0.11504772  0.112494450  0.002553268 0.7560385
-6  -0.08858800  0.104471753 -0.015883754 0.7772730
-7  -0.02198731  0.114238355 -0.092251049 0.8528901
-8   0.01603227  0.129705183 -0.145737452 0.9145330
-9  -0.08128619  0.100362814 -0.019076625 0.8021045
-10  0.07473808  0.131940192 -0.206678271 0.9593717
-11  0.12415721  0.117781808 -0.241939021 0.9701428
-12  0.43149748  0.014256144 -0.445753623 1.1634843
-13  0.57341676 -0.057012804 -0.516403960 1.2359068
-14  0.44827776 -0.008482064 -0.439795698 1.2136892
-15  0.44706780  0.012445087 -0.459512891 1.2669369
-16  0.80338718 -0.161948775 -0.641438408 1.3911863
-17  0.86726607 -0.206578427 -0.660687640 1.3816571
-18  0.93459703 -0.467367728 -0.467229298 1.1630300
-19  1.02437578 -0.531722724 -0.492653053 1.3438764
-20  1.08003900 -0.322568001 -0.757470997 1.7352183
-> all.equal( estElaLlEpaObs[[ "pOutput" ]] + estElaLlEpaObs[[ "pVarInput" ]],
-+    - estElaLlEpaObs[[ "pLabor" ]] )
-[1] TRUE
-> 
-> # local linear estimation with Epanechnikov kernel (gradients not restricted)
-> npseed( 123 )
-> estResultLlEpaAll <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights, restrictGrad = FALSE,
-+    ckertype = "epanechnikov", regtype = "ll" )
-Multistart 1 of 4 |Multistart 1 of 4 |Multistart 1 of 4 |Multistart 1 of 4 /Multistart 1 of 4 |Multistart 1 of 4 |Multistart 2 of 4 |Multistart 2 of 4 |Multistart 2 of 4 /Multistart 2 of 4 -Multistart 2 of 4 |Multistart 2 of 4 |Multistart 3 of 4 |Multistart 3 of 4 |Multistart 3 of 4 /Multistart 3 of 4 -Multistart 3 of 4 \Multistart 3 of 4 |Multistart 3 of 4 /Multistart 3 of 4 |Multistart 3 of 4 |Multistart 4 of 4 |Multistart 4 of 4 |Multistart 4 of 4 /Multistart 4 of 4 -Multistart 4 of 4 \Multistart 4 of 4 |Multistart 4 of 4 |Multistart 4 of 4 /                   > print( estResultLlEpaAll )
-$call
-npregHom(yName = "qVarInput", xNames = c("pOutput", "pVarInput", 
-    "pLabor", "land"), homWeights = weights, data = germanFarms, 
-    restrictGrad = FALSE, ckertype = "epanechnikov", regtype = "ll")
-
-$yName
-[1] "qVarInput"
-
-$xNames
-[1] "pOutput"   "pVarInput" "pLabor"    "land"     
-
-$homWeights
-     pOutput    pVarInput       pLabor 
-0.6723446781 0.3269168696 0.0007384522 
-
-$restrictGrad
-[1] FALSE
-
-$est
-
-Regression Data: 20 training points, in 4 variable(s)
-                   r_1       r_2      r_3      r_4
-Bandwidth(s): 1.357928 0.0287079 30.60942 3.472584
-
-Kernel Regression Estimator: Local-Linear
-Bandwidth Type: Fixed
-
-Continuous Kernel Type: Second-Order Epanechnikov
-No. Continuous Explanatory Vars.: 4
-
-
-$grad
-          pOutput   pVarInput       pLabor      land
- [1,]   113.06277 -111.606939 -0.202399404 113.71204
- [2,]   -34.31667   30.244576  0.055663485  20.98705
- [3,]  -460.74820  352.869068  0.793076983 153.37330
- [4,]  -157.02544  126.999687  0.234682352  14.39134
- [5,]   152.56777 -116.043680 -0.255397128  15.61131
- [6,]    22.50964  -22.925223  0.002458464  15.34287
- [7,]   -85.73646   62.970519  0.133446633  16.00345
- [8,]    93.85490  -67.770648 -0.136680149  19.78920
- [9,] -2175.83076 1423.260603  4.092919283  18.17416
-[10,]   -27.84922   23.726542  0.012910702  22.12632
-[11,]    31.28513  -17.402752 -0.063155760  24.75449
-[12,]  1527.34058 -937.477275 -2.304013146  26.55793
-[13,]  -425.91629  270.064132  0.561852238  25.93397
-[14,]  -640.02479  393.993729  0.953166655  23.44588
-[15,]   -26.71889   18.395835  0.032253761  26.16493
-[16,]    27.56468  -14.018818 -0.044105143  21.19257
-[17,]   128.40102  -78.530801 -0.139096717  17.75342
-[18,]    78.36095  -30.706740 -0.132745334  29.80464
-[19,]   208.03673 -101.789896 -0.229109129  25.37247
-[20,]   -24.21865    6.003906  0.047264679 -10.90285
-
-attr(,"class")
-[1] "npregHom"
-> all.equal( estResultLlEpaAll$grad[ , "pOutput" ] * germanFarms$pOutput +
-+    estResultLlEpaAll$grad[ , "pVarInput" ] * germanFarms$pVarInput,
-+    - estResultLlEpaAll$grad[ , "pLabor" ] * germanFarms$pLabor )
-[1] TRUE
-> estElaLlEpaAll <- elas( estResultLlEpaAll )
-> print( estElaLlEpaAll )
-       pOutput  pVarInput       pLabor         land
-1  -198.131377 167.609812  30.52156543 -48.41682867
-2    -6.229980   4.817193   1.41278647   0.91839514
-3   -42.099510  28.516971  13.58253898   3.51609533
-4   -24.221949  18.168864   6.05308513   0.58286197
-5    11.196774  -8.103646  -3.09312785   0.28841090
-6     3.530483  -3.595664   0.06518107   0.60714078
-7   -14.556761  10.641597   3.91516382   0.65211405
-8    14.129937 -10.423789  -3.70614779   0.72026010
-9   -49.632536  33.659088  15.97344837   0.09716211
-10   -3.792316   3.459215   0.33310144   0.75114232
-11    3.925010  -2.385022  -1.53998758   0.83393832
-12   74.188712 -49.055671 -25.13304113   0.40830733
-13  -45.710281  31.363289  14.34699201   0.93391150
-14  -19.472194  12.957558   6.51463532   0.23660517
-15   -3.378026   2.471936   0.90609053   1.02905536
-16    4.779821  -2.758774  -2.02104668   1.23972140
-17   16.859873 -11.817333  -5.04253933   0.79894880
-18    9.158065  -4.488745  -4.66931985   1.36745079
-19   56.523074 -35.830491 -20.69258311   2.98901811
-20   -2.504956   0.790036   1.71492043  -0.49794755
-> all.equal( estElaLlEpaAll[[ "pOutput" ]] + estElaLlEpaAll[[ "pVarInput" ]],
-+    - estElaLlEpaAll[[ "pLabor" ]] )
-[1] TRUE
-> estElaLlEpaAllObs <- elas( estResultLlEpaAll, yObs = TRUE )
-> print( estElaLlEpaAllObs )
-       pOutput    pVarInput       pLabor       land
-1    19.564884  -16.5509702  -3.01391378  4.7810178
-2    -5.679280    4.3913767   1.28790294  0.8372134
-3   -74.583716   50.5208178  24.06289857  6.2291333
-4   -22.780695   17.0877803   5.69291451  0.5481805
-5    23.311463  -16.8716313  -6.43983128  0.6004658
-6     3.426181   -3.4894368   0.06325542  0.5892040
-7   -13.743935   10.0473876   3.69654754  0.6157011
-8    15.561114  -11.4795819  -4.08153180  0.7932130
-9  -365.270799  247.7141579 117.55664113  0.7150648
-10   -4.490941    4.0964748   0.39446573  0.8895185
-11    4.570715   -2.7773830  -1.79333164  0.9711299
-12  189.415573 -125.2469241 -64.16864869  1.0424735
-13  -49.283609   33.8150639  15.46854524  1.0069185
-14  -77.854022   51.8071078  26.04691424  0.9459984
-15   -3.673439    2.6881095   0.98532926  1.1190475
-16    3.624078   -2.0917128  -1.53236508  0.9399614
-17   17.932902  -12.5694357  -5.36346666  0.8497971
-18    9.971934   -4.8876556  -5.08427797  1.4889749
-19   24.480265  -15.5182625  -8.96200206  1.2945501
-20   -2.805140    0.8847106   1.92042931 -0.5576195
-> all.equal( estElaLlEpaAllObs[[ "pOutput" ]] + estElaLlEpaAllObs[[ "pVarInput" ]],
-+    - estElaLlEpaAllObs[[ "pLabor" ]] )
-[1] TRUE
-> 
-> 
-> # local-linear estimation with manual bandwidth selection (restricted gradients)
-> estResultLlMan <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights, bws = rep( 1, 3 ),
-+    bwscaling = TRUE, regtype = "ll" )
-> print( estResultLlMan )
-$call
-npregHom(yName = "qVarInput", xNames = c("pOutput", "pVarInput", 
-    "pLabor", "land"), homWeights = weights, data = germanFarms, 
-    bws = rep(1, 3), bwscaling = TRUE, regtype = "ll")
-
-$yName
-[1] "qVarInput"
-
-$xNames
-[1] "pOutput"   "pVarInput" "pLabor"    "land"     
-
-$homWeights
-     pOutput    pVarInput       pLabor 
-0.6723446781 0.3269168696 0.0007384522 
-
-$restrictGrad
-[1] TRUE
-
-$est
-
-Regression Data: 20 training points, in 3 variable(s)
-                 r_2 r_3 r_4
-Scale Factor(s):   1   1   1
-
-Kernel Regression Estimator: Local-Linear
-Bandwidth Type: Fixed
-
-Continuous Kernel Type: Second-Order Gaussian
-No. Continuous Explanatory Vars.: 3
-
-
-$grad
-           pOutput  pVarInput        pLabor      land
- [1,] -0.930010002  0.6904991  0.0039308612 35.874703
- [2,] -1.758550304  1.7546404  0.0015674911 27.445316
- [3,] -1.014810642  2.0635746 -0.0043232489 22.849104
- [4,] -0.569253236  1.1519215 -0.0029848162 23.469961
- [5,]  0.003515428  0.5613268 -0.0032579310 24.313357
- [6,]  1.259701577 -0.2115120 -0.0062008011 27.442840
- [7,]  1.151369986 -0.1212609 -0.0059645598 27.105993
- [8,]  1.370414877 -0.2962616 -0.0059283193 27.374572
- [9,]  1.544402455 -0.4307125 -0.0064168560 28.594173
-[10,]  1.096819572 -0.6177639 -0.0022980414 24.187983
-[11,]  0.844312265 -0.8355097  0.0003518126 21.363702
-[12,]  4.138105567 -3.5627161 -0.0013362274 20.392204
-[13,]  9.363266922 -8.9327152  0.0012725261 16.732990
-[14,]  8.408819923 -7.8645644  0.0004121116 16.740515
-[15,]  5.412852684 -4.9436546 -0.0007132085 18.726915
-[16,]  7.837912143 -5.2355075 -0.0071759032 12.842848
-[17,]  3.774438782  0.6594992 -0.0164087188 11.809784
-[18,]  7.644679391 -2.6813263 -0.0142566095 28.644441
-[19,]  3.779844787 -3.5056967  0.0022924220 14.568927
-[20,]  2.155914057 -3.6919851  0.0072437976  9.491535
-
-attr(,"class")
-[1] "npregHom"
-> all.equal( estResultLlMan$grad[ , "pOutput" ] * germanFarms$pOutput +
-+    estResultLlMan$grad[ , "pVarInput" ] * germanFarms$pVarInput,
-+    - estResultLlMan$grad[ , "pLabor" ] * germanFarms$pLabor )
-[1] TRUE
-> estElaLlMan <- elas( estResultLlMan )
-> print( estElaLlMan )
-         pOutput   pVarInput      pLabor      land
-1  -0.1609060538  0.10238173  0.05852432 1.5080972
-2  -0.2919450207  0.25556391  0.03638112 1.0982752
-3  -0.1629424102  0.29305268 -0.13011027 0.9204830
-4  -0.0848937146  0.15932318 -0.07442947 0.9189837
-5   0.0005436001  0.08259352 -0.08313712 0.9464300
-6   0.1943122947 -0.03262628 -0.16168602 1.0680189
-7   0.1870151836 -0.01960439 -0.16741080 1.0566664
-8   0.2227033498 -0.04918704 -0.17351630 1.0754736
-9   0.2576786470 -0.07450441 -0.18317424 1.1181415
-10  0.1743154858 -0.10511746 -0.06919803 0.9583451
-11  0.1250970110 -0.13522811  0.01013110 0.8499581
-12  0.5311325396 -0.49261665 -0.03851588 0.8284315
-13  1.1448316959 -1.18185115  0.03701946 0.6864912
-14  1.0517817808 -1.06336178  0.01158000 0.6945427
-15  0.7078694170 -0.68714463 -0.02072479 0.7618471
-16  1.0286309221 -0.77976568 -0.24886524 0.5685941
-17  0.5138152642  0.10288748 -0.61670274 0.5509951
-18  0.9652638268 -0.42347091 -0.54179291 1.4198776
-19  0.4457536011 -0.53562097  0.08986737 0.7449524
-20  0.2496931635 -0.54399872  0.29430556 0.4854059
-> all.equal( estElaLlMan[[ "pOutput" ]] + estElaLlMan[[ "pVarInput" ]],
-+    - estElaLlMan[[ "pLabor" ]] )
-[1] TRUE
-> estElaLlManObs <- elas( estResultLlMan, yObs = TRUE )
-> print( estElaLlManObs )
-         pOutput   pVarInput       pLabor      land
-1  -0.1609330657  0.10239892  0.058534148 1.5083503
-2  -0.2910334301  0.25476591  0.036267516 1.0948459
-3  -0.1642726950  0.29544521 -0.131172511 0.9279980
-4  -0.0825852456  0.15499079 -0.072405546 0.8939943
-5   0.0005371368  0.08161150 -0.082148636 0.9351771
-6   0.1917385518 -0.03219413 -0.159544422 1.0538725
-7   0.1845697272 -0.01934803 -0.165221693 1.0428492
-8   0.2272143668 -0.05018336 -0.177031003 1.0972581
-9   0.2592688403 -0.07496420 -0.184304645 1.1250418
-10  0.1768721774 -0.10665922 -0.070212959 0.9724012
-11  0.1233528815 -0.13334273  0.009989851 0.8381078
-12  0.5131937491 -0.47597872 -0.037215026 0.8004515
-13  1.0834419731 -1.11847632  0.035034350 0.6496792
-14  1.0228673302 -1.03412899  0.011261655 0.6754491
-15  0.7441844023 -0.72239639 -0.021788008 0.8009312
-16  1.0304927005 -0.78117703 -0.249315674 0.5696232
-17  0.5271503544  0.10555772 -0.632708078 0.5652951
-18  0.9728345535 -0.42679227 -0.546042287 1.4310139
-19  0.4447849201 -0.53445699  0.089672073 0.7433335
-20  0.2497100979 -0.54403562  0.294325521 0.4854388
-> all.equal( estElaLlManObs[[ "pOutput" ]] + estElaLlManObs[[ "pVarInput" ]],
-+    - estElaLlManObs[[ "pLabor" ]] )
-[1] TRUE
-> 
-> # local-linear estimation with manual bandwidth selection (gradients not restricted)
-> estResultLlManAll <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights, restrictGrad = FALSE,
-+    bws = rep( 1, 4 ), bwscaling = TRUE, regtype = "ll" )
-> print( estResultLlManAll )
-$call
-npregHom(yName = "qVarInput", xNames = c("pOutput", "pVarInput", 
-    "pLabor", "land"), homWeights = weights, data = germanFarms, 
-    restrictGrad = FALSE, bws = rep(1, 4), bwscaling = TRUE, 
-    regtype = "ll")
-
-$yName
-[1] "qVarInput"
-
-$xNames
-[1] "pOutput"   "pVarInput" "pLabor"    "land"     
-
-$homWeights
-     pOutput    pVarInput       pLabor 
-0.6723446781 0.3269168696 0.0007384522 
-
-$restrictGrad
-[1] FALSE
-
-$est
-
-Regression Data: 20 training points, in 4 variable(s)
-                 r_1 r_2 r_3 r_4
-Scale Factor(s):   1   1   1   1
-
-Kernel Regression Estimator: Local-Linear
-Bandwidth Type: Fixed
-
-Continuous Kernel Type: Second-Order Gaussian
-No. Continuous Explanatory Vars.: 4
-
-
-$grad
-           pOutput   pVarInput      pLabor      land
- [1,]  -215.799232  204.502107  0.47114724 30.599706
- [2,]  -202.250541  166.798193  0.39993214 44.095084
- [3,]  -390.784079  271.929603  0.80173756 31.871544
- [4,]  -210.070695  163.211585  0.35106954 17.267485
- [5,]    32.620089  -24.929878 -0.05392015 18.230880
- [6,]   391.846140 -284.880305 -0.63278042 26.152766
- [7,] -1113.331469  808.400282  1.78646356 24.244263
- [8,]    26.208045  -18.717295 -0.03934066 22.317823
- [9,]  -462.597037  340.652121  0.63956997 27.439964
-[10,]   -72.935223   52.447540  0.08857316 22.473657
-[11,]  -309.178112  223.936913  0.33214603 23.253247
-[12,]     7.807936   -6.734019 -0.00246488 18.619813
-[13,]  -194.890813  125.282473  0.24933129 14.605070
-[14,]  -114.214595   71.981860  0.16204875 16.072769
-[15,]  -159.607740   86.905215  0.30260977 16.944240
-[16,]    48.395976  -30.408308 -0.05254897 11.163824
-[17,]  -122.385692   74.375271  0.13455833  9.897343
-[18,]   315.486981 -157.786508 -0.39248432 23.935566
-[19,]  -548.787360  186.676475  0.92333351  3.199730
-[20,]  1260.293995 -630.174723 -1.30722616  4.757866
-
-attr(,"class")
-[1] "npregHom"
-> all.equal( estResultLlManAll$grad[ , "pOutput" ] * germanFarms$pOutput +
-+    estResultLlManAll$grad[ , "pVarInput" ] * germanFarms$pVarInput,
-+    - estResultLlManAll$grad[ , "pLabor" ] * germanFarms$pLabor )
-[1] TRUE
-> estElaLlManAll <- elas( estResultLlManAll )
-> print( estElaLlManAll )
-        pOutput   pVarInput       pLabor       land
-1   -28.9850567  23.5394679   5.44558874  0.9986143
-2   -49.0776203  35.5099661  13.56765415  2.5791740
-3   -99.9252312  61.4994457  38.42578549  2.0447437
-4   -36.1591503  26.0549217  10.10422866  0.7803820
-5     4.5424882  -3.3033735  -1.23911476  0.6390848
-6    63.4170082 -46.1054857 -17.31152249  1.0678864
-7  -187.6271588 135.6025903  52.02456846  0.9805976
-8     4.2540544  -3.1039320  -1.15012238  0.8757860
-9   -52.9904634  40.4559615  12.53450188  0.7366814
-10  -11.1325767   8.5710694   2.56150734  0.8551723
-11  -38.7562022  30.6640697   8.09213251  0.7826963
-12    0.9609821  -0.8928529  -0.06812914  0.7253464
-13  -23.2983548  16.2065009   7.09185389  0.5858476
-14  -12.0236613   8.1913216   3.83233970  0.5612359
-15  -12.0562439   6.9771332   5.07911075  0.3981574
-16    6.9224507  -4.9361576  -1.98629304  0.5386980
-17  -17.4982414  12.1866955   5.31154594  0.4849908
-18   53.0716532 -33.2000095 -19.87164378  1.5806971
-19   51.2007970 -22.5644393 -28.63635772 -0.1294392
-20  108.6695949 -69.1289393 -39.54065561  0.1811514
-> all.equal( estElaLlManAll[[ "pOutput" ]] + estElaLlManAll[[ "pVarInput" ]],
-+    - estElaLlManAll[[ "pLabor" ]] )
-[1] TRUE
-> estElaLlManAllObs <- elas( estResultLlManAll, yObs = TRUE )
-> print( estElaLlManAllObs )
-        pOutput   pVarInput       pLabor      land
-1   -37.3428586  30.3270417   7.01581688 1.2865633
-2   -33.4717003  24.2183492   9.25335114 1.7590368
-3   -63.2582584  38.9325877  24.32567068 1.2944371
-4   -30.4763133  21.9600834   8.51622993 0.6577358
-5     4.9841588  -3.6245637  -1.35959510 0.7012237
-6    59.6427065 -43.3614898 -16.28121674 1.0043305
-7  -178.4719839 128.9859286  49.48605523 0.9327498
-8     4.3452858  -3.1704982  -1.17478761 0.8945679
-9   -77.6591600  59.2894605  18.36969947 1.0796293
-10  -11.7614712   9.0552608   2.70621040 0.9034822
-11  -45.1705046  35.7390927   9.43141195 0.9122355
-12    0.9683136  -0.8996647  -0.06864891 0.7308802
-13  -22.5511981  15.6867734   6.86442469 0.5670600
-14  -13.8933143   9.4650541   4.42826014 0.6485068
-15  -21.9436216  12.6991102   9.24451139 0.7246880
-16    6.3628808  -4.5371479  -1.82573287 0.4951529
-17  -17.0927824  11.9043125   5.18846990 0.4737529
-18   40.1477447 -25.1152060 -15.03253871 1.1957687
-19  -64.5773454  28.4595490  36.11779639 0.1632561
-20  145.9743424 -92.8599344 -53.11440802 0.2433382
-> all.equal( estElaLlManAllObs[[ "pOutput" ]] + estElaLlManAllObs[[ "pVarInput" ]],
-+    - estElaLlManAllObs[[ "pLabor" ]] )
-[1] TRUE
-> # different order of weights
-> estResultLlManAll2 <- npregHom( "qVarInput",
-+    xNames = c( "pOutput", "pVarInput", "pLabor", "land" ),
-+    data = germanFarms, homWeights = weights[ c( 3, 2, 1 ) ], restrictGrad = FALSE,
-+    bws = rep( 1, 4 ), bwscaling = TRUE, regtype = "ll" )
-> all.equal( estResultLlManAll$grad, estResultLlManAll2$grad )
-[1] TRUE
-> all.equal( estResultLlManAll$est, estResultLlManAll2$est, check.attributes = FALSE )
-[1] TRUE
-> 
