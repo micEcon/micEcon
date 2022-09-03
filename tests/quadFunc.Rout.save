@@ -2737,7 +2737,7 @@ $nShifter
 $est
 
 Model Formula: y ~ 1 + a_1 + a_2 + b_1_1 + b_1_2 + b_2_2
-<environment: 0x56370aa19198>
+<environment: 0x563d08985358>
 
 Coefficients:
      a_1      a_2    b_1_1    b_1_2    b_2_2 
@@ -2853,7 +2853,7 @@ attr(,"class")
 [1] TRUE
 Warning message:
 In predict.quadFuncEst(ggResult) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > round( predict( ggResult, newdata = ggData ), 2 )
      1      2      3      4      5      6      7      8      9     10     11 
  246.2  386.0  481.5  268.2  394.6  425.7  430.4  327.1  387.4  400.0  460.5 
@@ -2877,21 +2877,21 @@ In predict.quadFuncEst(ggResult) :
  322.2 
 Warning message:
 In predict.quadFuncEst(ggResult, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResult, newdata = ggData ),
 +    fitted( ggResult ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.364"
 Warning message:
 In predict.quadFuncEst(ggResult, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResult, newdata = ggData ),
 +    predict( ggResult ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.364"
 Warning messages:
 1: In predict.quadFuncEst(ggResult, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 2: In predict.quadFuncEst(ggResult) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > 
 > # random effects
 > ggResultRan <- quadFuncEst( "invest", c( "value", "capital" ), ggData,
@@ -2913,7 +2913,7 @@ $nShifter
 $est
 
 Model Formula: y ~ 1 + a_1 + a_2 + b_1_1 + b_1_2 + b_2_2
-<environment: 0x563708dfac48>
+<environment: 0x563d06d6a3e8>
 
 Coefficients:
 (Intercept)         a_1         a_2       b_1_1       b_1_2       b_2_2 
@@ -3043,13 +3043,13 @@ attr(,"class")
  [91]  200.4  221.2  206.1  200.8  212.9  215.1  262.4  274.2  305.4  324.7
 Warning message:
 In predict.quadFuncEst(ggResultRan) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResultRan ),
 +    fitted( ggResultRan ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.302"
 Warning message:
 In predict.quadFuncEst(ggResultRan) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > round( predict( ggResultRan, newdata = ggData ), 2 )
      1      2      3      4      5      6      7      8      9     10     11 
  253.9  396.0  491.1  274.9  404.9  436.1  441.0  335.5  397.6  410.4  471.1 
@@ -3073,21 +3073,21 @@ In predict.quadFuncEst(ggResultRan) :
  324.7 
 Warning message:
 In predict.quadFuncEst(ggResultRan, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResultRan, newdata = ggData ),
 +    fitted( ggResultRan ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.302"
 Warning message:
 In predict.quadFuncEst(ggResultRan, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResultRan, newdata = ggData ),
 +    predict( ggResultRan ), check.attributes = FALSE )
 [1] TRUE
 Warning messages:
 1: In predict.quadFuncEst(ggResultRan, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 2: In predict.quadFuncEst(ggResultRan) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > 
 > ## panel data with a shifter
 > ggData$yearInt <- as.numeric( as.character( ggData$year ) )
@@ -3112,7 +3112,7 @@ $nShifter
 $est
 
 Model Formula: y ~ 1 + a_1 + a_2 + b_1_1 + b_1_2 + b_2_2 + d_1
-<environment: 0x56370a584fc8>
+<environment: 0x563d084f0320>
 
 Coefficients:
      a_1      a_2    b_1_1    b_1_2    b_2_2      d_1 
@@ -3232,7 +3232,7 @@ attr(,"class")
 [1] TRUE
 Warning message:
 In predict.quadFuncEst(ggResShifter) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > round( predict( ggResShifter, newdata = ggData ), 2 )
      1      2      3      4      5      6      7      8      9     10     11 
  246.1  385.7  481.2  268.1  394.3  425.4  430.1  326.9  387.2  399.8  460.2 
@@ -3256,21 +3256,21 @@ In predict.quadFuncEst(ggResShifter) :
  322.5 
 Warning message:
 In predict.quadFuncEst(ggResShifter, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResShifter, newdata = ggData ),
 +    fitted( ggResShifter ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.364"
 Warning message:
 In predict.quadFuncEst(ggResShifter, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResShifter, newdata = ggData ),
 +    predict( ggResShifter ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.364"
 Warning messages:
 1: In predict.quadFuncEst(ggResShifter, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 2: In predict.quadFuncEst(ggResShifter) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > 
 > # random effects
 > ggResShifterRan <- quadFuncEst( "invest", c( "value", "capital" ), ggData,
@@ -3292,7 +3292,7 @@ $nShifter
 $est
 
 Model Formula: y ~ 1 + a_1 + a_2 + b_1_1 + b_1_2 + b_2_2 + d_1
-<environment: 0x563709549d48>
+<environment: 0x563d074b8c98>
 
 Coefficients:
 (Intercept)         a_1         a_2       b_1_1       b_1_2       b_2_2 
@@ -3422,13 +3422,13 @@ attr(,"class")
  [91]  200.7  221.6  206.4  201.1  213.3  215.5  262.9  274.5  305.3  322.5
 Warning message:
 In predict.quadFuncEst(ggResShifterRan) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResShifterRan ),
 +    fitted( ggResShifterRan ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.299"
 Warning message:
 In predict.quadFuncEst(ggResShifterRan) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > round( predict( ggResShifterRan, newdata = ggData ), 2 )
      1      2      3      4      5      6      7      8      9     10     11 
  254.7  397.7  492.9  275.6  406.3  437.6  442.4  336.4  398.9  411.8  472.5 
@@ -3452,21 +3452,21 @@ In predict.quadFuncEst(ggResShifterRan) :
  322.5 
 Warning message:
 In predict.quadFuncEst(ggResShifterRan, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResShifterRan, newdata = ggData ),
 +    fitted( ggResShifterRan ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.299"
 Warning message:
 In predict.quadFuncEst(ggResShifterRan, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResShifterRan, newdata = ggData ),
 +    predict( ggResShifterRan ), check.attributes = FALSE )
 [1] TRUE
 Warning messages:
 1: In predict.quadFuncEst(ggResShifterRan, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 2: In predict.quadFuncEst(ggResShifterRan) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > 
 > ## panel data with a logical variable as shifter
 > ggData$war <- ggData$yearInt >= 1939 & ggData$yearInt <= 1945
@@ -3490,7 +3490,7 @@ $nShifter
 $est
 
 Model Formula: y ~ 1 + a_1 + a_2 + b_1_1 + b_1_2 + b_2_2 + d_1_
-<environment: 0x56370780abd0>
+<environment: 0x563d05777d50>
 
 Coefficients:
       a_1       a_2     b_1_1     b_1_2     b_2_2  d_1_TRUE 
@@ -3610,7 +3610,7 @@ attr(,"class")
 [1] TRUE
 Warning message:
 In predict.quadFuncEst(ggResShifterLogi) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > round( predict( ggResShifterLogi, newdata = ggData ), 2 )
      1      2      3      4      5      6      7      8      9     10     11 
  256.0  394.0  488.4  276.4  387.1  417.9  422.7  319.0  379.9  392.5  452.6 
@@ -3634,21 +3634,21 @@ In predict.quadFuncEst(ggResShifterLogi) :
  322.7 
 Warning message:
 In predict.quadFuncEst(ggResShifterLogi, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResShifterLogi, newdata = ggData ),
 +    fitted( ggResShifterLogi ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.364"
 Warning message:
 In predict.quadFuncEst(ggResShifterLogi, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResShifterLogi, newdata = ggData ),
 +    predict( ggResShifterLogi ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.364"
 Warning messages:
 1: In predict.quadFuncEst(ggResShifterLogi, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 2: In predict.quadFuncEst(ggResShifterLogi) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > 
 > # random effects
 > ggResShifterLogiRan <- quadFuncEst( "invest", c( "value", "capital" ), ggData,
@@ -3670,7 +3670,7 @@ $nShifter
 $est
 
 Model Formula: y ~ 1 + a_1 + a_2 + b_1_1 + b_1_2 + b_2_2 + d_1_
-<environment: 0x56370971e3f8>
+<environment: 0x563d0768e940>
 
 Coefficients:
 (Intercept)         a_1         a_2       b_1_1       b_1_2       b_2_2 
@@ -3800,13 +3800,13 @@ attr(,"class")
  [91]  191.4  228.3  212.3  205.9  217.4  219.6  268.5  278.6  306.5  325.3
 Warning message:
 In predict.quadFuncEst(ggResShifterLogiRan) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResShifterLogiRan ),
 +    fitted( ggResShifterLogiRan ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.302"
 Warning message:
 In predict.quadFuncEst(ggResShifterLogiRan) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > round( predict( ggResShifterLogiRan, newdata = ggData ), 2 )
      1      2      3      4      5      6      7      8      9     10     11 
  263.8  404.1  498.1  283.2  397.4  428.4  433.2  327.3  390.1  402.9  463.1 
@@ -3830,21 +3830,21 @@ In predict.quadFuncEst(ggResShifterLogiRan) :
  325.3 
 Warning message:
 In predict.quadFuncEst(ggResShifterLogiRan, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResShifterLogiRan, newdata = ggData ),
 +    fitted( ggResShifterLogiRan ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.302"
 Warning message:
 In predict.quadFuncEst(ggResShifterLogiRan, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResShifterLogiRan, newdata = ggData ),
 +    predict( ggResShifterLogiRan ), check.attributes = FALSE )
 [1] TRUE
 Warning messages:
 1: In predict.quadFuncEst(ggResShifterLogiRan, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 2: In predict.quadFuncEst(ggResShifterLogiRan) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > 
 > ## panel data with a factor as shifter
 > ggData$decade <- as.factor( ifelse( ggData$yearInt <= 1939, "30s",
@@ -3869,7 +3869,7 @@ $nShifter
 $est
 
 Model Formula: y ~ 1 + a_1 + a_2 + b_1_1 + b_1_2 + b_2_2 + d_1_
-<environment: 0x563708d39938>
+<environment: 0x563d06ca7388>
 
 Coefficients:
       a_1       a_2     b_1_1     b_1_2     b_2_2   d_1_40s   d_1_50s 
@@ -3999,7 +3999,7 @@ attr(,"class")
 [1] TRUE
 Warning message:
 In predict.quadFuncEst(ggResShifterFac) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > round( predict( ggResShifterFac, newdata = ggData ), 2 )
      1      2      3      4      5      6      7      8      9     10     11 
  204.1  306.2  377.5  198.2  300.9  389.7  390.0  299.0  352.9  368.6  415.1 
@@ -4023,21 +4023,21 @@ In predict.quadFuncEst(ggResShifterFac) :
  302.9 
 Warning message:
 In predict.quadFuncEst(ggResShifterFac, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResShifterFac, newdata = ggData ),
 +    fitted( ggResShifterFac ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.483"
 Warning message:
 In predict.quadFuncEst(ggResShifterFac, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResShifterFac, newdata = ggData ),
 +    predict( ggResShifterFac ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.483"
 Warning messages:
 1: In predict.quadFuncEst(ggResShifterFac, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 2: In predict.quadFuncEst(ggResShifterFac) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > 
 > # random effects
 > ggResShifterFacRan <- quadFuncEst( "invest", c( "value", "capital" ), ggData,
@@ -4060,7 +4060,7 @@ $nShifter
 $est
 
 Model Formula: y ~ 1 + a_1 + a_2 + b_1_1 + b_1_2 + b_2_2 + d_1_
-<environment: 0x563709e04418>
+<environment: 0x563d07d71a48>
 
 Coefficients:
 (Intercept)         a_1         a_2       b_1_1       b_1_2       b_2_2 
@@ -4194,13 +4194,13 @@ attr(,"class")
  [91]  210.4  225.0  208.6  198.9  203.6  245.1  287.1  286.0  294.5  307.4
 Warning message:
 In predict.quadFuncEst(ggResShifterFacRan) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResShifterFacRan ),
 +    fitted( ggResShifterFacRan ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.404"
 Warning message:
 In predict.quadFuncEst(ggResShifterFacRan) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > round( predict( ggResShifterFacRan, newdata = ggData ), 2 )
      1      2      3      4      5      6      7      8      9     10     11 
  216.4  325.2  397.5  210.5  320.4  408.3  408.8  313.3  370.6  386.7  434.4 
@@ -4224,21 +4224,21 @@ In predict.quadFuncEst(ggResShifterFacRan) :
  307.4 
 Warning message:
 In predict.quadFuncEst(ggResShifterFacRan, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResShifterFacRan, newdata = ggData ),
 +    fitted( ggResShifterFacRan ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.404"
 Warning message:
 In predict.quadFuncEst(ggResShifterFacRan, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResShifterFacRan, newdata = ggData ),
 +    predict( ggResShifterFacRan ), check.attributes = FALSE )
 [1] TRUE
 Warning messages:
 1: In predict.quadFuncEst(ggResShifterFacRan, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 2: In predict.quadFuncEst(ggResShifterFacRan) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > 
 > ## linear estimations with panel data
 > # fixed effects
@@ -4269,7 +4269,7 @@ $nShifter
 $est
 
 Model Formula: y ~ 1 + a_1 + a_2
-<environment: 0x5637090fa200>
+<environment: 0x563d07069548>
 
 Coefficients:
   a_1   a_2 
@@ -4385,7 +4385,7 @@ attr(,"class")
 [1] TRUE
 Warning message:
 In predict.quadFuncEst(ggResultLin) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > round( predict( ggResultLin, newdata = ggData ), 2 )
       1       2       3       4       5       6       7       8       9      10 
  264.64  449.69  562.72  305.84  465.03  501.39  508.21  386.50  458.57  471.41 
@@ -4409,21 +4409,21 @@ In predict.quadFuncEst(ggResultLin) :
  207.61  237.17  219.62  216.10  235.79  239.21  298.64  320.24  368.86  393.76 
 Warning message:
 In predict.quadFuncEst(ggResultLin, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResultLin, newdata = ggData ),
 +    fitted( ggResultLin ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.309"
 Warning message:
 In predict.quadFuncEst(ggResultLin, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResultLin, newdata = ggData ),
 +    predict( ggResultLin ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.309"
 Warning messages:
 1: In predict.quadFuncEst(ggResultLin, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 2: In predict.quadFuncEst(ggResultLin) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > # random effects
 > ggResultLinRan <- quadFuncEst( "invest", c( "value", "capital" ), ggData,
 +    linear = TRUE, model = "random", random.method = "amemiya" )
@@ -4452,7 +4452,7 @@ $nShifter
 $est
 
 Model Formula: y ~ 1 + a_1 + a_2
-<environment: 0x56370a006be0>
+<environment: 0x563d07f75eb0>
 
 Coefficients:
 (Intercept)         a_1         a_2 
@@ -4578,13 +4578,13 @@ attr(,"class")
 [100]  393.34
 Warning message:
 In predict.quadFuncEst(ggResultLinRan) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResultLinRan ),
 +    fitted( ggResultLinRan ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.261"
 Warning message:
 In predict.quadFuncEst(ggResultLinRan) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > round( predict( ggResultLinRan, newdata = ggData ), 2 )
       1       2       3       4       5       6       7       8       9      10 
  263.61  446.97  559.18  304.99  462.59  498.60  505.48  385.11  456.36  468.90 
@@ -4608,21 +4608,21 @@ In predict.quadFuncEst(ggResultLinRan) :
  207.74  237.07  219.78  216.41  236.03  239.44  298.23  319.91  368.55  393.34 
 Warning message:
 In predict.quadFuncEst(ggResultLinRan, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResultLinRan, newdata = ggData ),
 +    fitted( ggResultLinRan ), check.attributes = FALSE )
 [1] "Mean relative difference: 0.261"
 Warning message:
 In predict.quadFuncEst(ggResultLinRan, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > all.equal( predict( ggResultLinRan, newdata = ggData ),
 +    predict( ggResultLinRan ), check.attributes = FALSE )
 [1] TRUE
 Warning messages:
 1: In predict.quadFuncEst(ggResultLinRan, newdata = ggData) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 2: In predict.quadFuncEst(ggResultLinRan) :
-  predictions with panel data models might return wrong results
+  predictions with panel data models may not return what you expect as it may ignore individual and/or time effects
 > 
 > ## compute partial derivatives of linear estimation results with panel data
 > # fixed effects
@@ -5375,4 +5375,4 @@ b_3_4 b_4_4
 > 
 > proc.time()
    user  system elapsed 
-  1.195   0.056   1.243 
+  1.134   0.073   1.200 
