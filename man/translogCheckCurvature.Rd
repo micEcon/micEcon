@@ -26,11 +26,11 @@ translogCheckCurvature( xNames, data, coef, convexity = TRUE,
    \item{dataLogged}{logical. Are the values in \code{data} already logged?}
    \item{x}{an object returned by \code{translogCheckCurvature}.}
    \item{\dots}{arguments passed from \code{translogCheckCurvature}
-      to \code{\link{semidefiniteness}}
+      to \code{\link[miscTools]{semidefiniteness}}
       (if argument \code{quasi} is \code{FALSE}),
-      \code{\link{quasiconvexity}}
+      \code{\link[miscTools]{quasiconvexity}}
       (if arguments \code{convexity} and \code{quasi} are both \code{TRUE}),
-      or \code{\link{quasiconcavity}}
+      or \code{\link[miscTools]{quasiconcavity}}
       (if argument \code{convexity} is \code{FALSE}
       and \code{quasi} is \code{TRUE}).
       Further arguments to \code{print.translogCheckCurvature}
