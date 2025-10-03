@@ -2,8 +2,11 @@ Package: micEcon
 Version: 0.6-19
 Date: 2022-09-03
 Title: Microeconomic Analysis and Modelling
-Author: Arne Henningsen
-Maintainer: Arne Henningsen <arne.henningsen@gmail.com>
+Authors@R: c( person( 
+  given = "Arne", 
+  family = "Henningsen", 
+  role = c( "aut", "cre" ), 
+  email = "arne.henningsen@gmail.com" ) )
 Depends: R (>= 3.5.0)
 Imports: miscTools (>= 0.6-1), plm (>= 1.1-0)
 Suggests: Ecdat (>= 0.1-5), systemfit (>= 1.0-0)
