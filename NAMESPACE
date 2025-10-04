@@ -19,8 +19,6 @@ export( "translogEst" )
 export( "translogHessian" )
 export( "translogMonoRestr" )
 export( "translogProdFuncMargCost" )
-export( ".quadFuncCheckHomWeights" )
-export( ".quadFuncVarHom" )
 
 S3method( "coef", "quadFuncEst" )
 S3method( "coef", "translogEst" )
